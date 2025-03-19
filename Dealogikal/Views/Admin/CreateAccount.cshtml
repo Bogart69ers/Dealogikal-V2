@@ -1,0 +1,263 @@
+﻿
+@{
+    ViewBag.Title = "CreateAccount";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="row">
+                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                    <h3 class="font-weight-bold" style="margin-left:5%;">Employee Form</h3>
+                </div>
+                <div class="col-12 grid-margin">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="form-sample" action="@Url.Action("CreateAccount", "Admin")" method="post">
+                                <p class="card-description">
+                                    Account Info
+                                </p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Employee ID</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="Employee ID" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Password </label>
+                                            <div class="col-sm-9">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" name="password" id="password" placeholder="Password" required />
+                                                    <div class="input-group-append" id="togglePassword" style="cursor: pointer;">
+                                                        <span class="input-group-text">
+                                                            <i class="icon-eye"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="card-description">
+                                    Employee Information
+                                </p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">First Name</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="firstName" id="firstName" placeholder="First Name" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Last Name</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="lastName" id="lastName" placeholder="Last Name" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Email</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="email" id="email" placeholder="Email" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Phone Number</label>
+                                            <div class="col-sm-9">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                            +63
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="form-control" name="phone" id="phone"
+                                                           placeholder="Enter 11-digit number" pattern="\d{11}" title="Please enter exactly 11 digits" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Department</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control" name="department" id="department" required>
+                                                    <option value="" disabled selected>Department</option>
+                                                    <option value="IT">IT</option>
+                                                    <option value="HR">HR</option>
+                                                    <option value="HR">Sales</option>
+                                                    <option value="Marketing">Marketing</option>
+                                                    <option value="Accounting">Accounting</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Position</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control" name="position" id="positionDropdown" required onchange="togglePositionInput(this)">
+                                                    <option value="" disabled selected>Select Position</option>
+                                                    <option value="Employee">Employee</option>
+                                                    <option value="Department Head">Department Head</option>
+                                                    <option value="Others">Others</option>
+                                                </select>
+                                                <!-- Hidden input field that will be displayed when "Others" is selected -->
+                                                <input type="text" class="form-control mt-2 d-none" placeholder="Enter Position" name="customPosition" id="customPositionInput">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Address </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" placeholder="Address" name="address" id="address" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Corporation</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control" name="corporation" id="corporationDropdown" required>
+                                                    <option value="" disabled selected>Select Corporation</option>
+                                                    <option value="Dealogikal">Dealogikal</option>
+                                                    <option value="KPEC">KPEC</option>
+                                                </select>
+                                                <!-- Hidden input field that will be displayed when "Others" is selected -->
+                                                <input type="text" class="form-control mt-2 d-none" placeholder="Enter Position" name="customPosition" id="customPositionInput">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">City</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" placeholder="City" name="city" id="city" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Barangay</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="barangay" placeholder="Barangay" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Date of Birth</label>
+                                            <div class="col-sm-9">
+                                                <input type="date" class="form-control" name="birthdate" id="birthdate" placeholder="dd/mm/yyyy" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Date Hired</label>
+                                            <div class="col-sm-9">
+                                                <input type="date" class="form-control" name="dateHired" id="dateHired" placeholder="dd/mm/yyyy" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mr-2">Create</button>
+                                <button class="btn btn-light" id="clearForm">Reset</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            Swal.fire({
+                title: 'Success',
+                text: successMessage,
+                icon: 'success',
+                timer: 1500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                width: '350px',
+                customClass: {
+                    popup: 'custom-swal-popup',
+                    icon: 'custom-swal-icon'
+                }
+            });
+        }
+    });
+</script>
+
+
+<script>
+    function togglePositionInput(selectElement) {
+        var customInput = document.getElementById("customPositionInput");
+        if (selectElement.value === "Others") {
+            customInput.classList.remove("d-none");
+            customInput.setAttribute("name", "position");
+            selectElement.removeAttribute("name");
+        } else {
+            customInput.classList.add("d-none");
+            customInput.removeAttribute("name");
+            selectElement.setAttribute("name", "position");
+        }
+    }
+</script>
+
+
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        var passwordField = document.getElementById("password");
+        var icon = this.querySelector("i");
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        } else {
+            passwordField.type = "password";
+            icon.classList.remove("bi-eye-slash");
+            icon.classList.add("bi-eye");
+        }
+    });
+</script>
+
+<script>
+    document.getElementById("clearForm").addEventListener("click", function() {
+        document.querySelectorAll(".form-sample input, .form-sample select").forEach(field => {
+            if (field.type !== "submit" && field.type !== "button") {
+                field.value = "";
+            }
+        });
+    });
+</script>
+

@@ -1,0 +1,773 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="DeologikalDTRModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="dtrRecords">
+          <Key>
+            <PropertyRef Name="recordId" />
+          </Key>
+          <Property Name="recordId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="date" Type="date" Nullable="false" />
+          <Property Name="timeIn" Type="datetime" />
+          <Property Name="breakOut" Type="datetime" />
+          <Property Name="breakIn" Type="datetime" />
+          <Property Name="timeOut" Type="datetime" />
+          <Property Name="createdAt" Type="datetime" />
+          <Property Name="workMode" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="employeeInfo">
+          <Key>
+            <PropertyRef Name="employeeId" />
+          </Key>
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="firstName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="lastName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="email" Type="nvarchar" MaxLength="255" />
+          <Property Name="birthdate" Type="date" />
+          <Property Name="phone" Type="nvarchar" MaxLength="20" />
+          <Property Name="position" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="department" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="corporation" Type="nvarchar" MaxLength="100" />
+          <Property Name="address" Type="nvarchar(max)" />
+          <Property Name="barangay" Type="nvarchar" MaxLength="255" />
+          <Property Name="city" Type="nvarchar" MaxLength="255" />
+          <Property Name="status" Type="int" />
+          <Property Name="dateHired" Type="date" Nullable="false" />
+          <Property Name="createdAt" Type="datetime" />
+          <Property Name="leaveCount" Type="int" />
+        </EntityType>
+        <EntityType Name="feedback">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="100" />
+          <Property Name="feedbackType" Type="nvarchar" MaxLength="255" />
+          <Property Name="feedbackMessage" Type="nvarchar(max)" />
+          <Property Name="dateCreated" Type="datetime" />
+          <Property Name="status" Type="int" />
+        </EntityType>
+        <EntityType Name="images">
+          <Key>
+            <PropertyRef Name="mediaId" />
+          </Key>
+          <Property Name="mediaId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" />
+          <Property Name="imageFile" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="leaveRequest">
+          <Key>
+            <PropertyRef Name="requestId" />
+          </Key>
+          <Property Name="requestId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" />
+          <Property Name="leaveStart" Type="date" />
+          <Property Name="leaveEnd" Type="date" />
+          <Property Name="leaveType" Type="nvarchar" MaxLength="100" />
+          <Property Name="leaveReason" Type="nvarchar(max)" />
+          <Property Name="dateFiled" Type="datetime" Nullable="false" />
+          <Property Name="status" Type="int" />
+          <Property Name="leaveRequestType" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="notification">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="title" Type="nvarchar(max)" />
+          <Property Name="message" Type="nvarchar(max)" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" />
+          <Property Name="isRead" Type="bit" />
+          <Property Name="createdAt" Type="datetime" />
+          <Property Name="senderId" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="overtimeRequest">
+          <Key>
+            <PropertyRef Name="requestId" />
+          </Key>
+          <Property Name="requestId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" />
+          <Property Name="overtimeStart" Type="datetime" />
+          <Property Name="overtimeEnd" Type="datetime" />
+          <Property Name="overtimeDate" Type="date" />
+          <Property Name="overtimeReason" Type="nvarchar(max)" />
+          <Property Name="dateFiled" Type="datetime" Nullable="false" />
+          <Property Name="status" Type="int" />
+        </EntityType>
+        <EntityType Name="role">
+          <Key>
+            <PropertyRef Name="roleId" />
+          </Key>
+          <Property Name="roleId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="roleName" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="todoLists">
+          <Key>
+            <PropertyRef Name="contentId" />
+          </Key>
+          <Property Name="contentId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" />
+          <Property Name="contents" Type="nvarchar(max)" />
+          <Property Name="status" Type="int" />
+          <Property Name="dateCreated" Type="datetime" />
+        </EntityType>
+        <EntityType Name="userAccount">
+          <Key>
+            <PropertyRef Name="userId" />
+          </Key>
+          <Property Name="userId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="password" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="role" Type="int" Nullable="false" />
+          <Property Name="createdAt" Type="datetime" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vw_Role">
+          <Key>
+            <PropertyRef Name="userId" />
+            <PropertyRef Name="employeeId" />
+          </Key>
+          <Property Name="userId" Type="int" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="roleName" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <Association Name="FK_dtrRecords_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="dtrRecords" Type="Self.dtrRecords" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="dtrRecords">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_images_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="images" Type="Self.images" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="images">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_leaveRequest_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="leaveRequest" Type="Self.leaveRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="leaveRequest">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notification_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="notification" Type="Self.notification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="notification">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_overtimeRequest_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="overtimeRequest" Type="Self.overtimeRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="overtimeRequest">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_todoLists_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="todoLists" Type="Self.todoLists" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="todoLists">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_userAccount_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="userAccount" Type="Self.userAccount" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="userAccount">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_userAccount_role">
+          <End Role="role" Type="Self.role" Multiplicity="1" />
+          <End Role="userAccount" Type="Self.userAccount" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="role">
+              <PropertyRef Name="roleId" />
+            </Principal>
+            <Dependent Role="userAccount">
+              <PropertyRef Name="role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DeologikalDTRModelStoreContainer">
+          <EntitySet Name="dtrRecords" EntityType="Self.dtrRecords" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="employeeInfo" EntityType="Self.employeeInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="feedback" EntityType="Self.feedback" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="images" EntityType="Self.images" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="leaveRequest" EntityType="Self.leaveRequest" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="notification" EntityType="Self.notification" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="overtimeRequest" EntityType="Self.overtimeRequest" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="role" EntityType="Self.role" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="todoLists" EntityType="Self.todoLists" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="userAccount" EntityType="Self.userAccount" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_Role" EntityType="Self.vw_Role" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_Role].[userId] AS [userId], 
+    [vw_Role].[employeeId] AS [employeeId], 
+    [vw_Role].[roleName] AS [roleName]
+    FROM [dbo].[vw_Role] AS [vw_Role]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_dtrRecords_employeeInfo" Association="Self.FK_dtrRecords_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="dtrRecords" EntitySet="dtrRecords" />
+          </AssociationSet>
+          <AssociationSet Name="FK_images_employeeInfo" Association="Self.FK_images_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="images" EntitySet="images" />
+          </AssociationSet>
+          <AssociationSet Name="FK_leaveRequest_employeeInfo" Association="Self.FK_leaveRequest_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="leaveRequest" EntitySet="leaveRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notification_employeeInfo" Association="Self.FK_notification_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="notification" EntitySet="notification" />
+          </AssociationSet>
+          <AssociationSet Name="FK_overtimeRequest_employeeInfo" Association="Self.FK_overtimeRequest_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="overtimeRequest" EntitySet="overtimeRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_todoLists_employeeInfo" Association="Self.FK_todoLists_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="todoLists" EntitySet="todoLists" />
+          </AssociationSet>
+          <AssociationSet Name="FK_userAccount_employeeInfo" Association="Self.FK_userAccount_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="userAccount" EntitySet="userAccount" />
+          </AssociationSet>
+          <AssociationSet Name="FK_userAccount_role" Association="Self.FK_userAccount_role">
+            <End Role="role" EntitySet="role" />
+            <End Role="userAccount" EntitySet="userAccount" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DeologikalDTRModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="dtrRecords">
+          <Key>
+            <PropertyRef Name="recordId" />
+          </Key>
+          <Property Name="recordId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="timeIn" Type="DateTime" Precision="3" />
+          <Property Name="breakOut" Type="DateTime" Precision="3" />
+          <Property Name="breakIn" Type="DateTime" Precision="3" />
+          <Property Name="timeOut" Type="DateTime" Precision="3" />
+          <Property Name="createdAt" Type="DateTime" Precision="3" />
+          <Property Name="workMode" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_dtrRecords_employeeInfo" FromRole="dtrRecords" ToRole="employeeInfo" />
+        </EntityType>
+        <EntityType Name="employeeInfo">
+          <Key>
+            <PropertyRef Name="employeeId" />
+          </Key>
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="firstName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="lastName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="birthdate" Type="DateTime" Precision="0" />
+          <Property Name="phone" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="position" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="department" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="corporation" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="barangay" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="city" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="status" Type="Int32" />
+          <Property Name="dateHired" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="createdAt" Type="DateTime" Precision="3" />
+          <Property Name="leaveCount" Type="Int32" />
+          <NavigationProperty Name="dtrRecords" Relationship="Self.FK_dtrRecords_employeeInfo" FromRole="employeeInfo" ToRole="dtrRecords" />
+          <NavigationProperty Name="images" Relationship="Self.FK_images_employeeInfo" FromRole="employeeInfo" ToRole="images" />
+          <NavigationProperty Name="leaveRequest" Relationship="Self.FK_leaveRequest_employeeInfo" FromRole="employeeInfo" ToRole="leaveRequest" />
+          <NavigationProperty Name="notification" Relationship="Self.FK_notification_employeeInfo" FromRole="employeeInfo" ToRole="notification" />
+          <NavigationProperty Name="overtimeRequest" Relationship="Self.FK_overtimeRequest_employeeInfo" FromRole="employeeInfo" ToRole="overtimeRequest" />
+          <NavigationProperty Name="todoLists" Relationship="Self.FK_todoLists_employeeInfo" FromRole="employeeInfo" ToRole="todoLists" />
+          <NavigationProperty Name="userAccount" Relationship="Self.FK_userAccount_employeeInfo" FromRole="employeeInfo" ToRole="userAccount" />
+        </EntityType>
+        <EntityType Name="feedback">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="feedbackType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="feedbackMessage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="dateCreated" Type="DateTime" Precision="3" />
+          <Property Name="status" Type="Int32" />
+        </EntityType>
+        <EntityType Name="images">
+          <Key>
+            <PropertyRef Name="mediaId" />
+          </Key>
+          <Property Name="mediaId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="imageFile" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_images_employeeInfo" FromRole="images" ToRole="employeeInfo" />
+        </EntityType>
+        <EntityType Name="leaveRequest">
+          <Key>
+            <PropertyRef Name="requestId" />
+          </Key>
+          <Property Name="requestId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="leaveStart" Type="DateTime" Precision="0" />
+          <Property Name="leaveEnd" Type="DateTime" Precision="0" />
+          <Property Name="leaveType" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="leaveReason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="dateFiled" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="status" Type="Int32" />
+          <Property Name="leaveRequestType" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_leaveRequest_employeeInfo" FromRole="leaveRequest" ToRole="employeeInfo" />
+        </EntityType>
+        <EntityType Name="notification">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="message" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="isRead" Type="Boolean" />
+          <Property Name="createdAt" Type="DateTime" Precision="3" />
+          <Property Name="senderId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_notification_employeeInfo" FromRole="notification" ToRole="employeeInfo" />
+        </EntityType>
+        <EntityType Name="overtimeRequest">
+          <Key>
+            <PropertyRef Name="requestId" />
+          </Key>
+          <Property Name="requestId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="overtimeStart" Type="DateTime" Precision="3" />
+          <Property Name="overtimeEnd" Type="DateTime" Precision="3" />
+          <Property Name="overtimeDate" Type="DateTime" Precision="0" />
+          <Property Name="overtimeReason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="dateFiled" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="status" Type="Int32" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_overtimeRequest_employeeInfo" FromRole="overtimeRequest" ToRole="employeeInfo" />
+        </EntityType>
+        <EntityType Name="role">
+          <Key>
+            <PropertyRef Name="roleId" />
+          </Key>
+          <Property Name="roleId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="roleName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="userAccount" Relationship="Self.FK_userAccount_role" FromRole="role" ToRole="userAccount" />
+        </EntityType>
+        <EntityType Name="todoLists">
+          <Key>
+            <PropertyRef Name="contentId" />
+          </Key>
+          <Property Name="contentId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="contents" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="status" Type="Int32" />
+          <Property Name="dateCreated" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_todoLists_employeeInfo" FromRole="todoLists" ToRole="employeeInfo" />
+        </EntityType>
+        <EntityType Name="userAccount">
+          <Key>
+            <PropertyRef Name="userId" />
+          </Key>
+          <Property Name="userId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="password" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="role" Type="Int32" Nullable="false" />
+          <Property Name="createdAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_userAccount_employeeInfo" FromRole="userAccount" ToRole="employeeInfo" />
+          <NavigationProperty Name="role1" Relationship="Self.FK_userAccount_role" FromRole="userAccount" ToRole="role" />
+        </EntityType>
+        <EntityType Name="vw_Role">
+          <Key>
+            <PropertyRef Name="userId" />
+            <PropertyRef Name="employeeId" />
+          </Key>
+          <Property Name="userId" Type="Int32" Nullable="false" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="roleName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_dtrRecords_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="dtrRecords" Type="Self.dtrRecords" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="dtrRecords">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_images_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="images" Type="Self.images" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="images">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_leaveRequest_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="leaveRequest" Type="Self.leaveRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="leaveRequest">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_notification_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="notification" Type="Self.notification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="notification">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_overtimeRequest_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="overtimeRequest" Type="Self.overtimeRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="overtimeRequest">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_todoLists_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="todoLists" Type="Self.todoLists" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="todoLists">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_userAccount_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="userAccount" Type="Self.userAccount" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="userAccount">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_userAccount_role">
+          <End Role="role" Type="Self.role" Multiplicity="1" />
+          <End Role="userAccount" Type="Self.userAccount" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="role">
+              <PropertyRef Name="roleId" />
+            </Principal>
+            <Dependent Role="userAccount">
+              <PropertyRef Name="role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DeologikalDTREntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="dtrRecords" EntityType="Self.dtrRecords" />
+          <EntitySet Name="employeeInfo" EntityType="Self.employeeInfo" />
+          <EntitySet Name="feedback" EntityType="Self.feedback" />
+          <EntitySet Name="images" EntityType="Self.images" />
+          <EntitySet Name="leaveRequest" EntityType="Self.leaveRequest" />
+          <EntitySet Name="notification" EntityType="Self.notification" />
+          <EntitySet Name="overtimeRequest" EntityType="Self.overtimeRequest" />
+          <EntitySet Name="role" EntityType="Self.role" />
+          <EntitySet Name="todoLists" EntityType="Self.todoLists" />
+          <EntitySet Name="userAccount" EntityType="Self.userAccount" />
+          <EntitySet Name="vw_Role" EntityType="Self.vw_Role" />
+          <AssociationSet Name="FK_dtrRecords_employeeInfo" Association="Self.FK_dtrRecords_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="dtrRecords" EntitySet="dtrRecords" />
+          </AssociationSet>
+          <AssociationSet Name="FK_images_employeeInfo" Association="Self.FK_images_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="images" EntitySet="images" />
+          </AssociationSet>
+          <AssociationSet Name="FK_leaveRequest_employeeInfo" Association="Self.FK_leaveRequest_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="leaveRequest" EntitySet="leaveRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_notification_employeeInfo" Association="Self.FK_notification_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="notification" EntitySet="notification" />
+          </AssociationSet>
+          <AssociationSet Name="FK_overtimeRequest_employeeInfo" Association="Self.FK_overtimeRequest_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="overtimeRequest" EntitySet="overtimeRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_todoLists_employeeInfo" Association="Self.FK_todoLists_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="todoLists" EntitySet="todoLists" />
+          </AssociationSet>
+          <AssociationSet Name="FK_userAccount_employeeInfo" Association="Self.FK_userAccount_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="userAccount" EntitySet="userAccount" />
+          </AssociationSet>
+          <AssociationSet Name="FK_userAccount_role" Association="Self.FK_userAccount_role">
+            <End Role="role" EntitySet="role" />
+            <End Role="userAccount" EntitySet="userAccount" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DeologikalDTRModelStoreContainer" CdmEntityContainer="DeologikalDTREntities">
+          <EntitySetMapping Name="dtrRecords">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.dtrRecords">
+              <MappingFragment StoreEntitySet="dtrRecords">
+                <ScalarProperty Name="recordId" ColumnName="recordId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="timeIn" ColumnName="timeIn" />
+                <ScalarProperty Name="breakOut" ColumnName="breakOut" />
+                <ScalarProperty Name="breakIn" ColumnName="breakIn" />
+                <ScalarProperty Name="timeOut" ColumnName="timeOut" />
+                <ScalarProperty Name="createdAt" ColumnName="createdAt" />
+                <ScalarProperty Name="workMode" ColumnName="workMode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="employeeInfo">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.employeeInfo">
+              <MappingFragment StoreEntitySet="employeeInfo">
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="firstName" ColumnName="firstName" />
+                <ScalarProperty Name="lastName" ColumnName="lastName" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="birthdate" ColumnName="birthdate" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="position" ColumnName="position" />
+                <ScalarProperty Name="department" ColumnName="department" />
+                <ScalarProperty Name="corporation" ColumnName="corporation" />
+                <ScalarProperty Name="address" ColumnName="address" />
+                <ScalarProperty Name="barangay" ColumnName="barangay" />
+                <ScalarProperty Name="city" ColumnName="city" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="dateHired" ColumnName="dateHired" />
+                <ScalarProperty Name="createdAt" ColumnName="createdAt" />
+                <ScalarProperty Name="leaveCount" ColumnName="leaveCount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="feedback">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.feedback">
+              <MappingFragment StoreEntitySet="feedback">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="feedbackType" ColumnName="feedbackType" />
+                <ScalarProperty Name="feedbackMessage" ColumnName="feedbackMessage" />
+                <ScalarProperty Name="dateCreated" ColumnName="dateCreated" />
+                <ScalarProperty Name="status" ColumnName="status" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="images">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.images">
+              <MappingFragment StoreEntitySet="images">
+                <ScalarProperty Name="mediaId" ColumnName="mediaId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="imageFile" ColumnName="imageFile" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="leaveRequest">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.leaveRequest">
+              <MappingFragment StoreEntitySet="leaveRequest">
+                <ScalarProperty Name="requestId" ColumnName="requestId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="leaveStart" ColumnName="leaveStart" />
+                <ScalarProperty Name="leaveEnd" ColumnName="leaveEnd" />
+                <ScalarProperty Name="leaveType" ColumnName="leaveType" />
+                <ScalarProperty Name="leaveReason" ColumnName="leaveReason" />
+                <ScalarProperty Name="dateFiled" ColumnName="dateFiled" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="leaveRequestType" ColumnName="leaveRequestType" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="notification">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.notification">
+              <MappingFragment StoreEntitySet="notification">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="message" ColumnName="message" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="isRead" ColumnName="isRead" />
+                <ScalarProperty Name="createdAt" ColumnName="createdAt" />
+                <ScalarProperty Name="senderId" ColumnName="senderId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="overtimeRequest">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.overtimeRequest">
+              <MappingFragment StoreEntitySet="overtimeRequest">
+                <ScalarProperty Name="requestId" ColumnName="requestId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="overtimeStart" ColumnName="overtimeStart" />
+                <ScalarProperty Name="overtimeEnd" ColumnName="overtimeEnd" />
+                <ScalarProperty Name="overtimeDate" ColumnName="overtimeDate" />
+                <ScalarProperty Name="overtimeReason" ColumnName="overtimeReason" />
+                <ScalarProperty Name="dateFiled" ColumnName="dateFiled" />
+                <ScalarProperty Name="status" ColumnName="status" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="role">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.role">
+              <MappingFragment StoreEntitySet="role">
+                <ScalarProperty Name="roleId" ColumnName="roleId" />
+                <ScalarProperty Name="roleName" ColumnName="roleName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="todoLists">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.todoLists">
+              <MappingFragment StoreEntitySet="todoLists">
+                <ScalarProperty Name="contentId" ColumnName="contentId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="contents" ColumnName="contents" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="dateCreated" ColumnName="dateCreated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="userAccount">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.userAccount">
+              <MappingFragment StoreEntitySet="userAccount">
+                <ScalarProperty Name="userId" ColumnName="userId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="role" ColumnName="role" />
+                <ScalarProperty Name="createdAt" ColumnName="createdAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_Role">
+            <EntityTypeMapping TypeName="DeologikalDTRModel.vw_Role">
+              <MappingFragment StoreEntitySet="vw_Role">
+                <ScalarProperty Name="userId" ColumnName="userId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="roleName" ColumnName="roleName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

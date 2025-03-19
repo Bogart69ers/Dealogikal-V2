@@ -1,0 +1,253 @@
+﻿
+@{
+    ViewBag.Title = "Faq";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-description mb-4 font-weight-bold" style="color:black;">
+                        Frequently Asked Questions
+                    </h3>
+
+                    <div class="accordion" id="faqAccordion">
+
+                        <!-- Employee Dashboard -->
+                        <div class="card">
+                            <div class="card-header" id="headingDashboard">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseDashboard" aria-expanded="false" aria-controls="collapseDashboard">
+                                        How to use Employee Dashboard?
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseDashboard" class="collapse" aria-labelledby="headingDashboard" data-parent="#faqAccordion" style="overflow:scroll;">
+                                <div class="card-body">
+                                    <ul>
+                                        <li>Choose Work Mode: <strong>Onsite</strong> or <strong>Work from Home</strong></li>
+                                        <li>Click <strong>Time In</strong> to record your attendance</li>
+                                        <li>Click <strong>Time Out</strong> when leaving</li>
+                                    </ul>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/Dashboard.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 1: Dashboard Screen where employee's Time Out and Time In</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Employee DTR -->
+                        <div class="card">
+                            <div class="card-header" id="headingDashboard">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseDTR" aria-expanded="false" aria-controls="collapseDashboard">
+                                        Where to navigate DTR Logs
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseDTR" class="collapse" aria-labelledby="headingDashboard" data-parent="#faqAccordion" style="overflow:scroll;">
+                                <div class="card-body">
+                                    <ul>
+                                        <li>On the left side panel of the screen click <strong>Daily Time Record</strong></li>
+                                        <li>Search the specific date of your <strong>DTR</strong></li>
+                                    </ul>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/DTR.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 2: Employee DTR Logs </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Request Leave -->
+                        <div class="card">
+                            <div class="card-header" id="headingLeave">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseLeave" aria-expanded="false" aria-controls="collapseLeave">
+                                        How to Request Leave?
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseLeave" class="collapse" aria-labelledby="headingLeave" data-parent="#faqAccordion" style="overflow:scroll;">
+                                <div class="card-body">
+                                    <ul>
+                                        <li>Navigate to <strong>Request</strong> from the sidebar</li>
+                                        <li>Select <strong>Request Leave</strong></li>
+                                        <li>Choose <strong>Leave Request Type</strong> and <strong>Leave Type</strong> (With Pay / Without Pay)</li>
+                                        <li>Choose <strong>Leave Start Date</strong> (at least 3 days in advance unless Sick/Emergency Leave)</li>
+                                        <li>Choose <strong>Leave End Date</strong></li>
+                                        <li>Provide Reason (optional)</li>
+                                        <li>Click <strong>Submit</strong></li>
+                                    </ul>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/LeaveRequestForm.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 3: Leave Request Form </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Request Overtime -->
+                        <div class="card">
+                            <div class="card-header" id="headingOvertime">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOvertime" aria-expanded="false" aria-controls="collapseOvertime">
+                                        How to Request Overtime?
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseOvertime" class="collapse" aria-labelledby="headingOvertime" data-parent="#faqAccordion" style="overflow:scroll;">
+                                <div class="card-body">
+                                    <ul>
+                                        <li>Navigate to <strong>Request</strong> from the sidebar</li>
+                                        <li>Select <strong>Request Overtime</strong></li>
+                                        <li>Choose <strong>Overtime Date</strong></li>
+                                        <li>Select <strong>Overtime Start</strong> and <strong>End Time</strong></li>
+                                        <li>Provide Reason</li>
+                                        <li>Click <strong>Submit</strong></li>
+                                    </ul>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/OvertimeRequestForm.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 4: Leave Request Form </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Send Feedback -->
+                        <div class="card">
+                            <div class="card-header" id="headingFeedback">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFeedback" aria-expanded="false" aria-controls="collapseFeedback">
+                                        How to Send Feedback?
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseFeedback" class="collapse" aria-labelledby="headingFeedback" data-parent="#faqAccordion" style="overflow:scroll;">
+                                <div class="card-body">
+                                    <ul>
+                                        <li>Click your profile icon (top right)</li>
+                                        <li>Select <strong>Send Feedback</strong></li>
+                                        <li>Enter your <strong>Name</strong>, choose <strong>Review Type</strong>, and enter your <strong>Message</strong></li>
+                                        <li>Click <strong>Submit</strong></li>
+                                    </ul>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/SendFeedback.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 5: Send Feedback Navigation Button </p>
+                                    </div>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/SendFeedbackForm.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 6: Send Feedback Form </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Actions -->
+                        <div class="card">
+                            <div class="card-header" id="headingProfileActions">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseProfileActions" aria-expanded="false" aria-controls="collapseProfileActions">
+                                        Profile Management (Details / Picture / Password)
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseProfileActions" class="collapse" aria-labelledby="headingProfileActions" data-parent="#faqAccordion" style="overflow:scroll;">
+                                <div class="card-body">
+                                    <ul>
+                                        <li><strong>Edit Details:</strong> Profile Icon → My Profile → Edit Details → Save Changes</li>
+                                        <li><strong>Change Picture:</strong> Profile Icon → My Profile → Edit Details → Upload Photo → Save Changes</li>
+                                        <li><strong>Change Password:</strong> Profile Icon → My Profile → Change Password → Fill in fields → Change Password</li>
+                                    </ul>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/MyProfile.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 7: The My Profile Navigation Bar </p>
+                                    </div>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/EditDetails.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 8: The Edit Details Button </p>
+                                    </div>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/EditProfileForm.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 9: Employee Details Form </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Department Head -->
+                        <div class="card">
+                            <div class="card-header" id="headingDeptHead">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseDeptHead" aria-expanded="false" aria-controls="collapseDeptHead">
+                                        For Department Heads (Leave & Overtime Approvals)
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseDeptHead" class="collapse" aria-labelledby="headingDeptHead" data-parent="#faqAccordion" style="overflow:scroll;">
+                                <div class="card-body">
+                                    <ul>
+                                        <li>Navigate to <strong>Request</strong> from the sidebar</li>
+                                        <li>Click <strong>Leave Requests</strong> or <strong>Overtime Requests</strong></li>
+                                        <li>View employee details</li>
+                                        <li>Choose <strong>Accept</strong> or <strong>Decline</strong></li>
+                                    </ul>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/PendingLeaveRequest.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 10: Pending Leave Request Table </p>
+                                    </div>
+                                    <div class="text-center my-4">
+                                        <img src="~/Assets/img/PendingOvertimeRequest.png" alt="Login Page Screenshot" class="img-fluid" style="max-width: 500px; border-radius: 10px; border: 1px solid #ddd;">
+                                        <p class="mt-2 text-muted">Figure 11: Pending Overtime Request Table </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- End of Accordion -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap (Ensure scripts are available in your layout or here) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    .accordion .card {
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+
+    .accordion .card-header {
+        background-color: #f7f7f7;
+        padding: 10px 20px;
+    }
+
+    .accordion .btn-link {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+    }
+
+        .accordion .btn-link:hover {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+    .accordion .card-body {
+        background-color: #fff;
+    }
+
+    ul {
+        list-style: disc;
+        margin-left: 20px;
+    }
+</style>

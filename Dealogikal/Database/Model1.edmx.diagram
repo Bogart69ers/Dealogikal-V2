@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="00705c7bfe9a4035a1a06831717b0eb8" Name="Diagram1">
+        <EntityTypeShape EntityType="DeologikalDTRModel.dtrRecords" Width="1.5" PointX="3" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.employeeInfo" Width="1.5" PointX="0.75" PointY="10.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.feedback" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.images" Width="1.5" PointX="3" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.leaveRequest" Width="1.5" PointX="3" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.notification" Width="1.5" PointX="3" PointY="13.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.overtimeRequest" Width="1.5" PointX="3" PointY="16.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.role" Width="1.5" PointX="3.75" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.todoLists" Width="1.5" PointX="3" PointY="20.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.userAccount" Width="1.5" PointX="6" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DeologikalDTRModel.vw_Role" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="DeologikalDTRModel.FK_dtrRecords_employeeInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="DeologikalDTRModel.FK_images_employeeInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="DeologikalDTRModel.FK_leaveRequest_employeeInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="DeologikalDTRModel.FK_notification_employeeInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="DeologikalDTRModel.FK_overtimeRequest_employeeInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="DeologikalDTRModel.FK_todoLists_employeeInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="DeologikalDTRModel.FK_userAccount_employeeInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="DeologikalDTRModel.FK_userAccount_role" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

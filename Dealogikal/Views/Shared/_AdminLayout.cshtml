@@ -1,0 +1,489 @@
+﻿@using Dealogikal.ViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - DTR</title>
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+    <link rel="stylesheet" href="~/Assets/vendors/feather/feather.css">
+    <link rel="stylesheet" href="~/Assets/vendors/ti-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="~/Assets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="~/Assets/vendors/ti-icons/css/themify-icons.css">
+    <link rel="stylesheet" type="~text/css" href="js/select.dataTables.min.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="~/Assets/css/vertical-layout-light/style.css">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="~/Assets/img/dealogikal-logo.ico" />
+    <style>
+
+        /* Adjust the count badge */
+        .notif-count {
+            position: absolute;
+            top: -4px;
+            right: -8px;
+            background-color: red;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 3px 5px;
+            border-radius: 50%;
+            max-width: 20px; /* Ensures the badge doesn't shrink */
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* Optional: Adjust icon container for alignment */
+        .count-indicator {
+            position: relative;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-scroller">
+        <!-- partial:partials/_navbar.html -->
+        <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+                @if (ViewBag.EmployeeInfo != null && ViewBag.EmployeeInfo.corporation == "Dealogikal")
+                {
+                    <a class="navbar-brand brand-logo mr-5" href="~/Admin/AdminDashboard"><img src="~/Assets/img/dealogikal-logo.png" class="mr-2" alt="logo" /></a>
+                    <a class="navbar-brand brand-logo-mini" href="~/Admin/AdminDashboard"><img src="~/Assets/img/dealogikal-logo-mini.png" alt="logo" /></a>
+                }
+                else if (ViewBag.EmployeeInfo != null && ViewBag.EmployeeInfo.corporation == "KPEC")
+                {
+                    <a class="navbar-brand brand-logo mr-5" href="~/Admin/AdminDashboard"><img src="~/Assets/img/kpec-logo.png" class="mr-2" alt="logo" style="height:45px;" /></a>
+                    <a class="navbar-brand brand-logo-mini" href="~/Admin/AdminDashboard"><img src="~/Assets/img/kpec-logo-mini.png" alt="logo" /></a>
+                }
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                    <span class="icon-menu"></span>
+                </button>
+                <ul class="navbar-nav mr-lg-2">
+                </ul>
+                <ul class="navbar-nav navbar-nav-right">
+                    @{
+                        var notifications = ViewBag.Notifications as List<AccountViewModel>;
+
+                        int unreadCount = 0;
+
+                        if (notifications != null)
+                        {
+                            unreadCount = notifications.Count(n => n.notif.isRead == false);
+                        }
+
+                        // Separate unread and read notifications
+                        List<AccountViewModel> unreadNotifications = notifications != null
+                            ? notifications.Where(n => !(n.notif.isRead ?? false)).ToList()
+                            : new List<AccountViewModel>();
+
+                        List<AccountViewModel> readNotifications = notifications != null
+                            ? notifications.Where(n => (n.notif.isRead ?? false)).ToList()
+                            : new List<AccountViewModel>();
+
+                    }
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+                            <i class="icon-bell bell mx-0"></i>
+                            @if (unreadCount > 0)
+                            {
+                                if (unreadCount > 9)
+                                {
+                                    <span class="notif-count">9+</span>
+                                }
+                                else
+                                {
+                                    <span class="notif-count">@unreadCount</span>
+                                }
+                            }
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
+                             aria-labelledby="notificationDropdown"
+                             style="max-height: 400px; overflow-y: auto;">
+                            <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+
+                            @if (notifications != null && notifications.Any())
+                            {
+                                // Unread Notifications
+                                if (unreadNotifications.Any())
+                                {
+                                    foreach (var notif in unreadNotifications)
+                                    {
+                                        <a class="dropdown-item preview-item">
+                                            <div class="preview-thumbnail">
+                                                <div class="preview-icon bg-success">
+                                                    <img src="@notif.AvatarUrl" alt="Avatar" style="width:50px;height:50px;flex-shrink:0" />
+                                                </div>
+                                            </div>
+                                            <div class="preview-item-content">
+                                                <h6 class="preview-subject font-weight-normal">@notif.notif.title</h6>
+                                                <p class="font-weight-light small-text mb-0 text-muted">@notif.notif.message</p>
+                                                <span class="notification-time text-muted small">@GetTimeAgo(notif.notif.createdAt)</span>
+                                            </div>
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <a class="dropdown-item preview-item">
+                                        <div class="preview-item-content">
+                                            <p class="font-weight-light small-text mb-0 text-muted">No Notification Available</p>
+                                        </div>
+                                    </a>
+                                }
+
+                                // Read Notifications (History)
+                                if (readNotifications.Any())
+                                {
+                                    <div class="dropdown-divider"></div>
+                                    <p class="mb-0 font-weight-normal float-left dropdown-header">Read Notifications</p>
+
+                                    foreach (var notif in readNotifications)
+                                    {
+                                        <a class="dropdown-item preview-item">
+                                            <div class="preview-thumbnail">
+                                                <div class="preview-icon bg-secondary">
+                                                    <img src="@notif.AvatarUrl" alt="Avatar" style="width:50px;height:50px;flex-shrink:0" />
+                                                </div>
+                                            </div>
+                                            <div class="preview-item-content">
+                                                <h6 class="preview-subject font-weight-normal">@notif.notif.title</h6>
+                                                <p class="font-weight-light small-text mb-0 text-muted">@notif.notif.message</p>
+                                                <span class="notification-time text-muted small">@GetTimeAgo(notif.notif.createdAt)</span>
+                                            </div>
+                                        </a>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <a class="dropdown-item preview-item">
+                                    <div class="preview-item-content">
+                                        <p class="font-weight-light small-text mb-0 text-muted">No Notification Available</p>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    </li>
+
+                    @functions {
+                        private string GetTimeAgo(DateTime? dateTime)
+                        {
+                            if (!dateTime.HasValue)
+                                return "just now";
+
+                            var ts = DateTime.Now - dateTime.Value;
+                            double delta = ts.TotalSeconds;
+
+                            if (delta < 0) return "just now";
+                            if (delta < 60) return ts.Seconds == 1 ? "1 second ago" : ts.Seconds + " seconds ago";
+                            if (delta < 120) return "1 minute ago";
+                            if (delta < 3600) return ts.Minutes + " minutes ago";
+                            if (delta < 7200) return "1 hour ago";
+                            if (delta < 86400) return ts.Hours + " hours ago";
+                            if (delta < 172800) return "yesterday";
+                            if (delta < 2592000) return ts.Days + " days ago";
+                            if (delta < 31104000)
+                            {
+                                int months = Convert.ToInt32(Math.Floor((double)ts.Days / 30));
+                                return (months <= 1) ? "1 month ago" : months + " months ago";
+                            }
+
+                            int years = Convert.ToInt32(Math.Floor((double)ts.Days / 365));
+                            return (years <= 1) ? "1 year ago" : years + " years ago";
+                        }
+                    }
+                    <li class="nav-item nav-profile dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+                            <img src="@(!string.IsNullOrEmpty(ViewBag.ProfilePicture) ? Url.Content("~/UploadedFiles/" + ViewBag.ProfilePicture) : Url.Content("~/Assets/img/profile.jpg"))"
+                                 alt="profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                            <a class="dropdown-item" href="~/Admin/MyProfile">
+                                <i class="ti-face-smile text-primary"></i>
+                                My Profile
+                            </a>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+                                <i class="ti-tag text-primary"></i>
+                                Send Feedback
+                            </a>
+                            <a class="dropdown-item" href="~/Admin/Faq">
+                                <i class="ti-help text-primary"></i>
+                                FAQ
+                            </a>
+                            <a class="dropdown-item" href="~/Home/Logout">
+                                <i class="ti-power-off text-primary"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+
+                </ul>
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                    <span class="icon-menu"></span>
+                </button>
+            </div>
+        </nav>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+            <!-- partial -->
+            <!-- partial:partials/_sidebar.html -->
+            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="~/Admin/AdminDashboard">
+                            <i class="icon-grid menu-icon"></i>
+                            <span class="menu-title">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+                            <i class="icon-clock menu-icon"></i>
+                            <span class="menu-title">Daily Time Record</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="auth">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"> <a class="nav-link" href="~/Admin/Dtr"> My DTR </a></li>
+                                <li class="nav-item"> <a class="nav-link" href="~/Admin/EmployeeDtr"> Employee DTR </a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="~/Admin/Accounts">
+                            <i class="icon-head menu-icon"></i>
+                            <span class="menu-title">Account Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+                            <i class="icon-paper-stack menu-icon"></i>
+                            <span class="menu-title">Request</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="form-elements">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" href="~/Admin/LeaveRequest">Leave Requests</a></li>
+                                <li class="nav-item"><a class="nav-link" href="~/Admin/OvertimeRequests">Overtime Requests</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                </ul>
+            </nav>
+            <!-- partial -->
+            <div class="main-panel">
+
+                @RenderBody()
+                <!-- content-wrapper ends -->
+                <!-- partial:partials/_footer.html -->
+                <footer class="footer">
+                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                        <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">2023 © Dealogikal Corp. All Rights Reserved. Terms and Conditions | Privacy Policy</span>
+                    </div>
+                </footer>
+                <!-- partial -->
+            </div>
+            <!-- main-panel ends -->
+        </div>
+        <!-- page-body-wrapper ends -->
+    </div>
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="feedbackModalLabel">Send Feedback Form</h3>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" aria-label="Close" style="min-width:10px; min-height:10px;">Close</button>
+                </div>
+                <div class="modal-body">
+                    <form class="forms-sample d-flex flex-column flex-grow-1" action="@Url.Action("CreateFeedback", "Admin")" method="post">
+                        <!-- Name Field -->
+                        <div class="form-group">
+                            <label for="feedbackname">Name:</label>
+                            <input type="text" id="feedbackname" name="name" class="form-control" placeholder="Enter name..." required style="min-width:100%">
+                        </div>
+                        <!-- Review Type -->
+                        <div class="form-group">
+                            <label for="reviewtype">Review Type:</label>
+                            <select id="reviewtype" class="form-control" name="feedbackType" required>
+                                <option value="" disabled selected>Select Review Type</option>
+                                <option value="Feedback">Feedback</option>
+                                <option value="Bugs">Bugs</option>
+                                <option value="Others">Others</option> <!-- Fixed value -->
+                            </select>
+                            <input type="text" id="otherReviewType" class="form-control mt-2" name="feedbackType" placeholder="Specify other review type..." style="display:none;">
+                        </div>
+                        <!-- Feedback Message -->
+                        <div class="form-group flex-grow-1">
+                            <label for="feedbackMessage">Feedback Message:</label>
+                            <textarea id="feedbackMessage" class="form-control" name="feedbackMessage" placeholder="Enter your feedback..." style="height:75%; min-width:100%;" required></textarea>
+                        </div>
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-center mt-auto">
+                            <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                            <button type="reset" class="btn btn-light">Reset</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("🚀 JavaScript Loaded! Ready to handle form submission.");
+
+            // Ensure the form exists inside the modal
+            let feedbackForm = document.querySelector("#feedbackModal .forms-sample");
+
+            if (!feedbackForm) {
+                console.error("⚠️ Feedback form not found! Check modal structure.");
+                return;
+            }
+
+            feedbackForm.addEventListener("submit", function (event) {
+                event.preventDefault(); // ✅ Prevent full-page reload
+                console.log("📩 Form submitted, preparing AJAX request...");
+
+                let formData = new FormData(feedbackForm);
+                let actionUrl = feedbackForm.getAttribute("action");
+
+                fetch(actionUrl, {
+                    method: "POST",
+                    body: formData
+                })
+                    .then(response => response.json()) // ✅ Ensure response is parsed as JSON
+                    .then(data => {
+                        console.log("✅ AJAX Response:", data); // ✅ Log response for debugging
+
+                        if (data.success) {
+                            console.log("🎉 Success! Showing SweetAlert...");
+
+                            Swal.fire({
+                                title: "Success",
+                                text: data.message,
+                                icon: "success",
+                                timer: 2000, // Auto-close after 2 seconds
+                                timerProgressBar: true,
+                                width: '350px', // Reduce popup width
+                                showConfirmButton: false
+                            });
+
+                            // ✅ Close modal & refresh page after success
+                            setTimeout(() => {
+                                console.log("🔄 Closing modal and reloading page...");
+                                $('#feedbackModal').modal('hide'); // Hide Bootstrap modal
+                                document.body.classList.remove("modal-open");
+                                document.getElementById("feedbackModal").style.display = "none";
+                                location.reload(); // Refresh to show updates
+                            }, 2000);
+                        } else {
+                            console.log("❌ Error response received, showing error alert...");
+                            Swal.fire({
+                                title: "Error",
+                                text: data.message,
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("🚨 AJAX Error:", error);
+
+                        Swal.fire({
+                            title: "Error",
+                            text: "Something went wrong. Please try again.",
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                    });
+            });
+        });
+    </script>
+    <script>
+        // Handle the "Others" dropdown selection
+        document.getElementById('reviewtype').addEventListener('change', function () {
+            let otherInput = document.getElementById('otherReviewType');
+            if (this.value === "Others") {
+                otherInput.style.display = 'block';
+                otherInput.setAttribute("required", "required");
+            } else {
+                otherInput.style.display = 'none';
+                otherInput.removeAttribute("required");
+            }
+        });
+
+        // Reset form and hide "Others" input when clicking reset
+        document.getElementById('clearForm').addEventListener('click', function () {
+            document.querySelector(".forms-sample").reset();
+            document.getElementById('otherReviewType').style.display = 'none';
+        });
+    </script>
+    <script>
+        function markAllNotificationsAsRead() {
+            fetch('@Url.Action("MarkAllNotificationsAsRead", "Admin")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    console.log(data.message);
+                    const notifCount = document.querySelector('.notif-count');
+                    if (notifCount) {
+                        notifCount.style.display = 'none';
+                    }
+
+                } else {
+                    console.error('Failed to mark notifications:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+    </script>
+
+    <!-- Bootstrap JS (Ensure Bootstrap is included in your project) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Your Other Scripts -->
+    <script src="~/Assets/vendors/js/vendor.bundle.base.js"></script>
+
+    <script src="~/Assets/vendors/chart.js/Chart.min.js"></script>
+    <script src="~/Assets/vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
+    <script src="~/Assets/js/dataTables.select.min.js"></script>
+
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="~/Assets/js/off-canvas.js"></script>
+    <script src="~/Assets/js/hoverable-collapse.js"></script>
+    <script src="~/Assets/js/template.js"></script>
+    <script src="~/Assets/js/settings.js"></script>
+    <script src="~/Assets/js/todolist.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page-->
+    <script src="~/Assets/js/dashboard.js"></script>
+    <script src="~/Assets/js/Chart.roundedBarCharts.js"></script>
+    <!-- End custom js for this page-->
+
+</body>
+</html>

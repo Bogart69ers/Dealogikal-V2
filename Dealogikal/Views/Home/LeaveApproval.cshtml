@@ -1,0 +1,252 @@
+﻿@model Dealogikal.ViewModel.AccountViewModel
+
+@{
+    ViewBag.Title = "LeaveApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .employee-details-container {
+        display: flex;
+        align-items: center;
+        gap: 20px; /* Spacing between profile and info */
+        padding: 15px;
+        background: #f8f9fa; /* Light background */
+        border-radius: 10px;
+    }
+
+    .profile-section img {
+        width: 120px;
+        height: 500px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #ddd;
+    }
+
+    .info-section {
+        flex-grow: 1;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Two columns */
+        gap: 10px 20px; /* Space between items */
+    }
+
+    .edit-button {
+        margin-top: 15px;
+    }
+</style>
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="row">
+                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                    <h3 class="font-weight-bold" style="margin-left:5%;">Leave Requests</h3>
+                </div>
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <!-- 🔍 Search Bar -->
+                                    <input type="text" id="searchInput" class="form-control mb-3 w-25" placeholder="Search Employees..." style="margin-left: 75%">
+
+                                    <div class="table-responsive">
+                                        <table id="employeeTable" class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th onclick="sortTable(0)">Employee ID</th>
+                                                    <th onclick="sortTable(1)">Name</th>
+                                                    <th onclick="sortTable(2)">Date Filed</th>
+                                                    <th onclick="sortTable(4)">Request Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var leave in Model.leaveRequests) // ✅ Use leaveRequests directly
+                                                {
+                                                    <tr>
+                                                        <td>@leave.employeeId</td>
+                                                        <td>@leave.employeeInfo.firstName @leave.employeeInfo.lastName</td>
+                                                        <td>@leave.dateFiled.ToString("MMMM dd, yyyy")</td>
+                                                        <td>
+                                                            <label class="badge @(leave.status == 0 ? "badge-warning" : leave.status == 1 ? "badge-success" : "badge-danger")">
+                                                                @(leave.status == 0 ? "Pending" : leave.status == 1 ? "Accepted" : "Declined")
+                                                            </label>
+                                                        </td>
+                                                        <td style="text-align:center;">
+                                                            <button class="btn btn-outline-info btn-sm"
+                                                                    onclick="toggleDetails('details-@leave.requestId')">
+                                                                Details
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr id="details-@leave.requestId" class="details-row" style="display:none;">
+                                                        <td colspan="6">
+                                                            <div class="employee-details-container">
+                                                                <!-- Employee Info -->
+                                                                <div class="info-section">
+                                                                    <h4 style="margin-bottom:1.5rem;">@leave.employeeInfo.firstName @leave.employeeInfo.lastName</h4>
+                                                                    <div class="info-grid">
+                                                                        <p><strong>Leave Request Type: </strong> @(string.IsNullOrEmpty(@leave.leaveRequestType) ? "No Information" : @leave.leaveRequestType)</p>
+                                                                        <p><strong>Leave Type: </strong>@(leave.leaveType == "leavewithpay" ? "LP" : leave.leaveType == "leavewithoutpay" ? "LWP" : leave.leaveType)</p>
+                                                                        <p><strong>Leave Start: </strong> @(leave.leaveStart.HasValue ? leave.leaveStart.Value.ToString("MMM dd,yyyy") : "N/A")</p>
+                                                                        <p><strong>Leave End: </strong> @(leave.leaveEnd.HasValue ? leave.leaveEnd.Value.ToString("MMM dd,yyyy") : "N/A")</p>
+                                                                        <p>
+                                                                            <strong>Request Status: </strong>
+                                                                            <label class="badge @(leave.status == 0 ? "badge-warning" : leave.status == 1 ? "badge-success" : "badge-danger")">
+                                                                                @(leave.status == 0 ? "Pending" : leave.status == 1 ? "Accepted" : "Declined")
+                                                                            </label>
+                                                                        </p>
+                                                                        <p>
+                                                                            <strong>Leave Reason: </strong> @leave.leaveReason
+                                                                        </p>
+                                                                    </div>
+
+                                                                    <!-- Edit Info Button -->
+                                                                    @if (leave.status == 0)
+                                                                    {
+                                                                        <form action="@Url.Action("LeaveApproval","Home")" method="post">
+                                                                            <input type="hidden" name="requestId" value="@leave.requestId" />
+                                                                            <input type="hidden" name="empoyeeId" value="@leave.employeeId" />
+                                                                            <button class="btn btn-primary btn-sm edit-button btn-success" type="submit" name="action" value="Accept">Accept</button>
+                                                                            <button class="btn btn-primary btn-sm edit-button btn-danger" type="submit" name="action" value="Decline">Decline</button>
+                                                                        </form>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination Controls -->
+                                    <div class="mt-3">
+                                        <button id="prevPage" class="btn btn-secondary btn-sm">Previous</button>
+                                        <button id="nextPage" class="btn btn-secondary btn-sm">Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let currentPage = 1;
+    let rowsPerPage = 5;
+    let table = document.getElementById("employeeTable");
+    let tbody = table.getElementsByTagName("tbody")[0];
+    let allRows = Array.from(tbody.getElementsByTagName("tr")).filter(row => !row.classList.contains("details-row"));
+    let rows = [...allRows]; // Copy for filtering
+
+    function displayPage(page) {
+        let start = (page - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+
+        // Hide all rows first
+        allRows.forEach(row => row.style.display = "none");
+        rows.slice(start, end).forEach(row => row.style.display = "");
+
+        // Hide all details when switching pages
+        document.querySelectorAll(".details-row").forEach(row => row.style.display = "none");
+
+        updatePagination();
+    }
+
+    function updatePagination() {
+        document.getElementById("prevPage").disabled = currentPage === 1;
+        document.getElementById("nextPage").disabled = currentPage * rowsPerPage >= rows.length;
+    }
+
+    document.getElementById("prevPage").addEventListener("click", function () {
+        if (currentPage > 1) {
+            currentPage--;
+            displayPage(currentPage);
+        }
+    });
+
+    document.getElementById("nextPage").addEventListener("click", function () {
+        if (currentPage * rowsPerPage < rows.length) {
+            currentPage++;
+            displayPage(currentPage);
+        }
+    });
+
+    displayPage(currentPage);
+
+    // 🔍 Optimized Search Functionality with Reset
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase().trim();
+
+        if (filter === "") {
+            // If search is cleared, reset to original list
+            rows = [...allRows];
+        } else {
+            // Filter rows based on search input
+            rows = allRows.filter(row => row.innerText.toLowerCase().includes(filter));
+        }
+
+        currentPage = 1; // Reset to first page
+        displayPage(currentPage);
+    });
+
+    // 🔽 Sorting Functionality
+    window.sortTable = function (columnIndex) {
+        let switching = true;
+        let direction = "asc";
+
+        while (switching) {
+            switching = false;
+            for (let i = 0; i < rows.length - 1; i++) {
+                let shouldSwitch = false;
+                let row1 = rows[i].getElementsByTagName("td")[columnIndex].innerText.toLowerCase();
+                let row2 = rows[i + 1].getElementsByTagName("td")[columnIndex].innerText.toLowerCase();
+
+                if ((direction === "asc" && row1 > row2) || (direction === "desc" && row1 < row2)) {
+                    tbody.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (!shouldSwitch) {
+                direction = (direction === "asc") ? "desc" : "asc";
+            }
+        }
+
+        // Reset pagination after sorting
+        rows = [...allRows];
+        currentPage = 1;
+        displayPage(currentPage);
+    };
+
+    // 🔽 Toggle Details Row (Only Show One at a Time)
+    window.toggleDetails = function (id) {
+        let row = document.getElementById(id);
+
+        // Hide all other details rows
+        document.querySelectorAll(".details-row").forEach(r => {
+            if (r !== row) r.style.display = "none";
+        });
+
+        // Toggle the clicked row
+        row.style.display = (row.style.display === "none" || row.style.display === "") ? "table-row" : "none";
+    };
+});
+</script>
+
+<script>
+function editInfo(employeeId) {
+    window.location.href = "/Admin/EditEmployee?employeeId=" + employeeId;
+}
+</script>

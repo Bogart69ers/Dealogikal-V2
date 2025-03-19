@@ -1,0 +1,238 @@
+﻿@model Dealogikal.ViewModel.AccountViewModel
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var name = ViewBag.Name;
+}
+
+<link href="~/Assets/css/Dashboard.css" rel="stylesheet" />
+
+@if (Model.dtr != null)
+{
+    <input type="hidden" id="timeIn" value="@(Model.dtr.timeIn.HasValue ? Model.dtr.timeIn.Value.ToString("HH:mm") : "")" />
+    <input type="hidden" id="breakIn" value="@(Model.dtr.breakIn.HasValue ? Model.dtr.breakIn.Value.ToString("HH:mm") : "")" />
+    <input type="hidden" id="breakOut" value="@(Model.dtr.breakOut.HasValue ? Model.dtr.breakOut.Value.ToString("HH:mm") : "")" />
+    <input type="hidden" id="timeOut" value="@(Model.dtr.timeOut.HasValue ? Model.dtr.timeOut.Value.ToString("HH:mm") : "")" />
+}
+else
+{
+    <input type="hidden" id="timeIn" value="" />
+    <input type="hidden" id="breakIn" value="" />
+    <input type="hidden" id="breakOut" value="" />
+    <input type="hidden" id="timeOut" value="" />
+}
+
+<div class="dashboard-wrapper">
+    <div class="content-wrapper">
+        <div class="row">
+            <h2 class="font-weight-bold text-left">Welcome @name</h2>
+
+            <!-- CARD CONTAINER -->
+            <div class="col-md-12 d-flex flex-column align-items-start dashboard-container bg-white p-4 rounded-4 shadow-sm">
+
+                <!-- CLOCK + FORM SECTION -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between w-100 dashboard-row">
+
+                    <!-- CLOCK -->
+                    <div class="d-flex flex-column align-items-center clock-container me-4">
+                        <canvas id="analogClock" width="200" height="200" style="background: white; border-radius: 50%; border: 1px solid #ddd;"></canvas>
+                        <div id="digitalClock" class="digital-clock mt-2 fw-bold"></div>
+                        <div id="liveDate" class="live-date text-muted"></div>
+                    </div>
+
+                    <!-- FORM CONTROLS -->
+                    <form class="form-sample d-flex flex-column align-items-center" action="@Url.Action("Dtr", "Home")" method="post">
+                        <input type="hidden" name="recordId" value="@(Model.dtr != null ? Model.dtr.recordId : 0)" />
+
+                        <div class="d-flex flex-column align-items-center gap-2 button-section">
+                            <select id="workMode" class="form-control w-100 text-center mb-2" name="workMode" required>
+                                @if (Model.dtr != null && Model.dtr.recordId > 0)
+                                {
+                                    <option value="Onsite" @(Model.dtr.workMode == "Onsite" ? "selected" : "")>Onsite</option>
+                                    <option value="WFH" @(Model.dtr.workMode == "WFH" ? "selected" : "")>Work from Home</option>
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>Work Mode</option>
+                                    <option value="Onsite">Onsite</option>
+                                    <option value="WFH">Work from Home</option>
+                                }
+                            </select>
+
+                            <div class="button-group">
+                                <button type="submit" id="btn1" class="btn btn-inverse-info" name="action" value="">Time In</button>
+                                <button type="submit" id="btn2" class="btn btn-inverse-dark" name="action" value="">Time In</button>
+
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- PENDING REQUESTS -->
+                    <div class="pending-requests">
+                        <div class="info-box">
+                            <a href="~/Home/LeaveRequest" class="d-block text-white fw-bold">Pending Leave Request:</a>
+                            <a href="~/Home/LeaveRequest" class="text-white fw-bold">@Model.leaveRequests.Count(c => c.status == 0)</a>
+                        </div>
+                        <div class="info-box">
+                            <a href="OvertimeRequest" class="d-block text-white fw-bold">Pending Overtime Request:</a>
+                            <a href="OvertimeRequest" class="text-white fw-bold">@Model.overtimeRequests.Count(o => o.status == 0)</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DTR TABLE -->
+                <div class="table-container w-100 mt-4" style="overflow:scroll;">
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Date</th>
+                                <th colspan="2">Morning</th>
+                                <th colspan="2">Afternoon</th>
+                                <th rowspan="2">Work Mode</th>
+                            </tr>
+                            <tr>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.dtr != null)
+                            {
+                                <tr>
+                                    <td>@Model.dtr.date.ToString("dd MMM yyyy")</td>
+                                    <td class="@(Model.dtr.timeIn.HasValue && Model.dtr.timeIn.Value.TimeOfDay > new TimeSpan(8, 5, 0) ? "late-time" : "")">
+                                        @(Model.dtr.timeIn.HasValue ? Model.dtr.timeIn.Value.ToString("hh:mm tt") : "")
+                                    </td>
+                                    <td>@(Model.dtr.breakIn.HasValue ? Model.dtr.breakIn.Value.ToString("hh:mm tt") : "")</td>
+                                    <td>@(Model.dtr.breakOut.HasValue ? Model.dtr.breakOut.Value.ToString("hh:mm tt") : "")</td>
+                                    <td>@(Model.dtr.timeOut.HasValue ? Model.dtr.timeOut.Value.ToString("hh:mm tt") : "")</td>
+                                    <td>@Model.dtr.workMode</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>@DateTime.Now.ToString("dd MMM yyyy")</td>
+                                    <td colspan="5">No records</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function updateButtons() {
+        var now = new Date();
+        var currentHour = now.getHours();
+
+        var timeInVal = $('#timeIn').val();
+        var breakInVal = $('#breakIn').val();
+        var breakOutVal = $('#breakOut').val();
+        var timeOutVal = $('#timeOut').val();
+
+        var btn1 = $('#btn1');
+        var btn2 = $('#btn2');
+
+        if (currentHour < 12) {
+            // Morning Shift: Time In & Break In
+            if (!timeInVal) {
+                console.log("Enable Time In Button");
+                btn1.text("Time In").val("TimeIn").prop("disabled", false);
+                btn2.text("Time Out").val("BreakIn").prop("disabled", true);
+            } else if (timeInVal && !breakInVal) {
+                console.log("Enable Break In Button");
+                btn1.prop("disabled", true);
+                btn2.text("Time Out").val("BreakIn").prop("disabled", false);
+            } else {
+                console.log("Disable Morning Buttons");
+                btn1.prop("disabled", true);
+                btn2.prop("disabled", true);
+            }
+        } else {
+            // Afternoon Shift: Break Out & Time Out
+            if (!breakOutVal) {
+                console.log("Enable Break Out Button");
+                btn1.text("Time In").val("BreakOut").prop("disabled", false);
+                btn2.text("Time Out").val("TimeOut").prop("disabled", true);
+            } else if (breakOutVal && !timeOutVal) {
+                console.log("Enable Time Out Button");
+                btn1.prop("disabled", true);
+                btn2.text("Time Out").val("TimeOut").prop("disabled", false);
+            } else {
+                console.log("Disable Afternoon Buttons");
+                btn1.prop("disabled", true);
+                btn2.prop("disabled", true);
+            }
+        }
+    }
+
+    // Run button update on page load
+    $(document).ready(function () {
+        updateButtons();
+        setInterval(updateButtons, 1000);
+    });
+</script>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        hours = hours % 12 || 12;
+
+        document.getElementById("digitalClock").textContent =
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${ampm}`;
+
+        document.getElementById("liveDate").textContent = now.toDateString();
+
+        if (typeof drawAnalogClock === "function") {
+            drawAnalogClock(hours, minutes, seconds);
+        }
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function drawAnalogClock(hours, minutes, seconds) {
+        const canvas = document.getElementById("analogClock");
+        const ctx = canvas.getContext("2d");
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+
+        function drawHand(length, width, angle, color = "black") {
+            ctx.save();
+            ctx.rotate(angle * (Math.PI / 180));
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -length);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        drawHand(50, 6, (hours % 12) * 30 + minutes * 0.5);
+        drawHand(70, 4, minutes * 6);
+        drawHand(90, 2, seconds * 6, "red");
+
+        ctx.restore();
+        }
+        setInterval(updateClock, 1000);
+</script>
+

@@ -1,0 +1,448 @@
+﻿@model Dealogikal.ViewModel.AccountViewModel
+@{
+    ViewBag.Title = "Accounts";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+
+    .employee-details-container {
+        display: flex;
+        align-items: center;
+        gap: 20px; /* Spacing between profile and info */
+        padding: 15px;
+        background: #f8f9fa; /* Light background */
+        border-radius: 10px;
+    }
+
+    .profile-section img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #ddd;
+    }
+
+    .profile-employee td img {
+        width: 500px;
+        height: 500px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #ddd;
+    }
+
+
+    .info-section {
+        flex-grow: 1;
+        padding: 20px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Two columns */
+        gap: 10px 20px; /* Space between items */
+    }
+
+    .edit-button {
+        margin-top: 15px;
+    }
+</style>
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="row">
+                <div class="col-12 mb-4 mb-xl-0">
+                    <div class="d-flex justify-content-between align-items-center" style="margin-left:3%; margin-bottom: 10px">
+                        <h3 class="font-weight-bold">Employee Information</h3>
+                        <button class="btn btn-info btn-md" onclick="addEmployee()">+ Create Employee</button>
+                    </div>
+                </div>
+
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+
+                                    <!-- 🔍 Search Bar -->
+                                    <input type="text" id="searchInput" class="form-control mb-3 w-25" placeholder="Search Employees..." style="margin-left: 75%">
+
+                                    <div class="table-responsive">
+                                        <table id="employeeTable" class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th onclick="sortTable(0)">Employee ID</th>
+                                                    <th onclick="sortTable(1)">Name</th>
+                                                    <th onclick="sortTable(2)">Department</th>
+                                                    <th onclick="sortTable(3)">Position</th>
+                                                    <th onclick="sortTable(4)">Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var employee in Model.employeeInfos)
+                                                {
+                                                    <tr>
+                                                        <td>@employee.employeeId</td>
+                                                        <td>@employee.firstName @employee.lastName</td>
+                                                        <td>@employee.department</td>
+                                                        <td>@employee.position</td>
+                                                        <td>
+                                                            <label class="badge @(employee.status == 0 ? "badge-danger" : employee.status == 1 ? "badge-success" : "badge-secondary")">
+                                                                @(employee.status == 0 ? "Deactivated" : employee.status == 1 ? "Active" : "Unknown")
+                                                            </label>
+                                                        </td>
+                                                        <td style="text-align:center;">
+                                                            <button class="btn btn-outline-info btn-sm"
+                                                                    onclick="toggleDetails('details-@employee.employeeId')">
+                                                                Details
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr id="details-@employee.employeeId" class="details-row" style="display:none;">
+                                                        <td colspan="6">
+                                                            <div class="employee-details-container">
+                                                                <!-- Employee Info -->
+                                                                <div class="profile-employee">
+                                                                    <img src="@(!string.IsNullOrEmpty(Model.images.FirstOrDefault(img => img.employeeId == employee.employeeId)?.imageFile) ?
+                                                                        Url.Content("~/UploadedFiles/" + Model.images.FirstOrDefault(img => img.employeeId == employee.employeeId).imageFile) :
+                                                                        Url.Content("~/Assets/img/profile.jpg"))"
+                                                                         alt="Profile Picture" style="width:150px; height:150px; border: solid 1px gray;">
+                                                                </div>
+                                                                <div class="info-section">
+                                                                    <h3 style="margin-bottom:15px;"><strong>@employee.firstName @employee.lastName</strong></h3>
+                                                                    <div class="info-grid">
+                                                                        <p><strong>Email:</strong> @(string.IsNullOrEmpty(employee.email) ? "No Information" : employee.email)</p>
+                                                                        <p><strong>Phone:</strong> @(string.IsNullOrEmpty(employee.phone) ? "No Information" : employee.phone)</p>
+                                                                        <p><strong>Department:</strong> @employee.department</p>
+                                                                        <p><strong>Position:</strong> @employee.position</p>
+                                                                        <p><strong>Corporation:</strong> @employee.corporation</p>
+
+                                                                        <p>
+                                                                            <strong>Status:</strong>
+                                                                            <label class="badge @(employee.status == 0 ? "badge-danger" : employee.status == 1 ? "badge-success" : "badge-secondary")">
+                                                                                @(employee.status == 0 ? "Deactivated" : employee.status == 1 ? "Active" : "Unknown")
+                                                                            </label>
+                                                                        </p>
+                                                                        <p>
+                                                                            <strong>Date Hired:</strong>
+                                                                            @(employee.dateHired == default(DateTime) ? "No Information" : employee.dateHired.ToString("MMMM dd, yyyy"))
+                                                                        </p>
+                                                                        <p>
+                                                                            <strong>Birthdate:</strong>
+                                                                            @(employee.birthdate.HasValue ? employee.birthdate.Value.ToString("MMMM dd, yyyy") : "No Information")
+                                                                        </p>
+                                                                        <p>
+                                                                            <strong>Address:</strong>
+                                                                            @(string.IsNullOrEmpty(employee.address) ? "No Information" : $"{employee.address}, {employee.barangay}, {employee.city}")
+                                                                        </p>
+                                                                    </div>
+
+                                                                    <!-- Edit Info Button -->
+                                                                    <button class="btn btn-primary btn-sm edit-button" onclick="editInfo('@employee.employeeId')">✏ Edit Info</button>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination Controls -->
+                                    <div class="mt-3">
+                                        <button id="prevPage" class="btn btn-secondary btn-sm">Previous</button>
+                                        <button id="nextPage" class="btn btn-secondary btn-sm">Next</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Employee Info Modal -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <!-- Wider modal -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee Info</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form id="editEmployeeForm" action="@Url.Action("EditEmployee", "Admin")" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <!-- Profile Picture Upload Section -->
+                        <div class="col-md-4 text-center d-flex flex-column align-items-center justify-content-center">
+                            <label>Profile Picture</label>
+                            <div class="profile-pic-container">
+                                <img id="employeeProfilePreview" src="@Url.Content("~/Assets/img/profile.jpg")" alt="Profile Picture"
+                                     class="rounded-circle" style="width: 150px; height: 150px; border: 1px solid #ddd; object-fit: cover;">
+                            </div>
+                            <input type="file" id="employeeProfileImageInput" name="profilePicture" class="d-none" accept="image/*" />
+                            <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('employeeProfileImageInput').click()">
+                                Upload Photo
+                            </button>
+                        </div>
+
+                        <!-- Employee Details -->
+                        <div class="col-md-8">
+                            <input type="hidden" id="editEmployeeId" name="employeeId" />
+
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editFirstName">First Name</label>
+                                        <input type="text" class="form-control" id="editFirstName" name="firstName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editLastName">Last Name</label>
+                                        <input type="text" class="form-control" id="editLastName" name="lastName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editDateHired">Date Hired</label>
+                                        <input type="date" class="form-control" id="editDateHired" name="dateHired" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editPhone">Phone Number</label>
+                                        <input type="text" class="form-control" id="editPhone" name="phone">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editAddress">Address</label>
+                                        <input type="text" class="form-control" id="editAddress" name="address">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editBarangay">Barangay</label>
+                                        <input type="text" class="form-control" id="editBarangay" name="barangay">
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editDepartment">Department</label>
+                                        <input type="text" class="form-control" id="editDepartment" name="department" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editPosition">Position</label>
+                                        <input type="text" class="form-control" id="editPosition" name="position" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editBirthdate">Date of Birth</label>
+                                        <input type="date" class="form-control" id="editBirthdate" name="birthdate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editEmail">Email</label>
+                                        <input type="email" class="form-control" id="editEmail" name="email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editCity">City</label>
+                                        <input type="text" class="form-control" id="editCity" name="city">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editCorporation">Corporation</label>
+                                        <input type="text" class="form-control" id="editCorporation" name="corporation" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" form="editEmployeeForm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let currentPage = 1;
+    let rowsPerPage = 5;
+    let table = document.getElementById("employeeTable");
+    let tbody = table.getElementsByTagName("tbody")[0];
+    let allRows = Array.from(tbody.getElementsByTagName("tr")).filter(row => !row.classList.contains("details-row"));
+    let rows = [...allRows]; // Copy for filtering
+
+    function displayPage(page) {
+        let start = (page - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+
+        // Hide all rows first
+        allRows.forEach(row => row.style.display = "none");
+        rows.slice(start, end).forEach(row => row.style.display = "");
+
+        // Hide all details when switching pages
+        document.querySelectorAll(".details-row").forEach(row => row.style.display = "none");
+
+        updatePagination();
+    }
+
+    function updatePagination() {
+        document.getElementById("prevPage").disabled = currentPage === 1;
+        document.getElementById("nextPage").disabled = currentPage * rowsPerPage >= rows.length;
+    }
+
+    document.getElementById("prevPage").addEventListener("click", function () {
+        if (currentPage > 1) {
+            currentPage--;
+            displayPage(currentPage);
+        }
+    });
+
+    document.getElementById("nextPage").addEventListener("click", function () {
+        if (currentPage * rowsPerPage < rows.length) {
+            currentPage++;
+            displayPage(currentPage);
+        }
+    });
+
+    displayPage(currentPage);
+
+    // 🔍 Optimized Search Functionality with Reset
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase().trim();
+
+        if (filter === "") {
+            // If search is cleared, reset to original list
+            rows = [...allRows];
+        } else {
+            // Filter rows based on search input
+            rows = allRows.filter(row => row.innerText.toLowerCase().includes(filter));
+        }
+
+        currentPage = 1; // Reset to first page
+        displayPage(currentPage);
+    });
+
+    // 🔽 Sorting Functionality
+    window.sortTable = function (columnIndex) {
+        let switching = true;
+        let direction = "asc";
+
+        while (switching) {
+            switching = false;
+            for (let i = 0; i < rows.length - 1; i++) {
+                let shouldSwitch = false;
+                let row1 = rows[i].getElementsByTagName("td")[columnIndex].innerText.toLowerCase();
+                let row2 = rows[i + 1].getElementsByTagName("td")[columnIndex].innerText.toLowerCase();
+
+                if ((direction === "asc" && row1 > row2) || (direction === "desc" && row1 < row2)) {
+                    tbody.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (!shouldSwitch) {
+                direction = (direction === "asc") ? "desc" : "asc";
+            }
+        }
+
+        // Reset pagination after sorting
+        rows = [...allRows];
+        currentPage = 1;
+        displayPage(currentPage);
+    };
+
+    // 🔽 Toggle Details Row (Only Show One at a Time)
+    window.toggleDetails = function (id) {
+        let row = document.getElementById(id);
+
+        // Hide all other details rows
+        document.querySelectorAll(".details-row").forEach(r => {
+            if (r !== row) r.style.display = "none";
+        });
+
+        // Toggle the clicked row
+        row.style.display = (row.style.display === "none" || row.style.display === "") ? "table-row" : "none";
+    };
+});
+</script>
+
+<script>
+
+    function addEmployee() {
+        window.location.href = '/Admin/CreateAccount';
+    }
+</script>
+
+<script>
+    // Assuming employeeData is injected from Razor into JS (placed near the bottom of your view)
+    const employeeData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+    Model.employeeInfos,
+    new Newtonsoft.Json.JsonSerializerSettings
+    {
+        ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+    }
+));
+
+const employeeImages = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.images, new Newtonsoft.Json.JsonSerializerSettings
+                  {
+                      ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                  }
+                  ));
+
+
+    function editInfo(employeeId) {
+        const employee = employeeData.find(e => e.employeeId === employeeId);
+        const employeeImage = employeeImages.find(img => img.employeeId === employeeId);
+
+        if (!employee) return;
+
+        // Fill inputs
+        document.getElementById('editEmployeeId').value = employee.employeeId;
+        document.getElementById('editFirstName').value = employee.firstName || '';
+        document.getElementById('editLastName').value = employee.lastName || '';
+        document.getElementById('editDateHired').value = employee.dateHired ? employee.dateHired.split('T')[0] : '';
+        document.getElementById('editPhone').value = employee.phone || '';
+        document.getElementById('editAddress').value = employee.address || '';
+        document.getElementById('editBarangay').value = employee.barangay || '';
+        document.getElementById('editDepartment').value = employee.department || '';
+        document.getElementById('editPosition').value = employee.position || '';
+        document.getElementById('editBirthdate').value = employee.birthdate ? employee.birthdate.split('T')[0] : '';
+        document.getElementById('editEmail').value = employee.email || '';
+        document.getElementById('editCity').value = employee.city || '';
+        document.getElementById('editCorporation').value = employee.corporation || '';
+
+        // Handle profile image preview
+        const imgPath = employeeImage && employeeImage.imageFile
+            ? '/UploadedFiles/' + employeeImage.imageFile
+            : '/Assets/img/profile.jpg';
+
+        document.getElementById('employeeProfilePreview').src = imgPath;
+
+        // Show modal (Bootstrap 5 way)
+        const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
+        modal.show();
+    }
+
+    // Optional: Preview uploaded image
+    document.getElementById('employeeProfileImageInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('employeeProfilePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+

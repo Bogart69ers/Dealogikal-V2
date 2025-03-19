@@ -1,0 +1,460 @@
+﻿@model Dealogikal.ViewModel.AccountViewModel
+@{
+    ViewBag.Title = "EmployeeDtr";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .late-time {
+        color: red;
+        font-weight: bold;
+    }
+
+    .info-section {
+        flex-grow: 1;
+        text-align: center;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Two columns */
+        gap: 10px 20px; /* Space between items */
+    }
+
+    .edit-button {
+        margin-top: 15px;
+    }
+
+    .table-responsive {
+        text-align: center;
+    }
+
+    .form-select-sm {
+        width: 150px;
+        padding: 5px;
+    }
+</style>
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="row">
+                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                    <h3 class="font-weight-bold" style="margin-left:5%;">Employee DTR</h3>
+                </div>
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card" style="overflow:scroll">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+
+                                        <!-- Left Side: Download Button & Dropdowns -->
+                                        <div class="d-flex align-items-center gap-2">
+                                            <!-- Download All Button -->
+                                            <button class="btn btn-outline-info btn-sm" onclick="downloadAllEmployeeDTR()">
+                                                <i class="ti-download"></i> Download All Employee DTR
+                                            </button>
+
+
+                                            <!-- Month Dropdown -->
+                                            <select id="allMonthSelect" class="form-select form-select-sm" style="width: 150px; margin-left:10px; border-radius:5px;">
+                                                <option value="1">January</option>
+                                                <option value="2">February</option>
+                                                <option value="3">March</option>
+                                                <option value="4">April</option>
+                                                <option value="5">May</option>
+                                                <option value="6">June</option>
+                                                <option value="7">July</option>
+                                                <option value="8">August</option>
+                                                <option value="9">September</option>
+                                                <option value="10">October</option>
+                                                <option value="11">November</option>
+                                                <option value="12">December</option>
+                                            </select>
+
+                                            <!-- Cutoff Dropdown -->
+                                            <select id="allCutoffSelect" class="form-select form-select-sm" style="width: 120px; margin-left:10px; border-radius:5px;">
+                                                <option value="9-23">9 - 23</option>
+                                                <option value="24-8">24 - 8</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Right Side: Search Bar -->
+                                        <div class="d-flex align-items-center">
+                                            <input type="text" id="searchInput" class="form-control form-control-sm w-100" placeholder="Search Employees..." style="min-width: 200px;">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="table-responsive">
+                                        <table id="employeeTable" class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Employee ID</th>
+                                                    <th>Name</th>
+                                                    <th>Department</th>
+                                                    <th>Position</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="employeeData">
+                                                @foreach (var employee in Model.employeeInfos)
+                                                {
+                                                    <tr class="employee-row">
+                                                        <td>@employee.employeeId</td>
+                                                        <td>@employee.firstName @employee.lastName</td>
+                                                        <td>@employee.department</td>
+                                                        <td>@employee.position</td>
+                                                        <td>
+                                                            <label class="badge @(employee.status == 0 ? "badge-danger" : "badge-success")">
+                                                                @(employee.status == 0 ? "Deactivated" : "Active")
+                                                            </label>
+                                                        </td>
+                                                        <td style="text-align:center;">
+                                                            <button class="btn btn-outline-info btn-sm" onclick="toggleDetails('details-@employee.employeeId')">
+                                                                Details
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr id="details-@employee.employeeId" class="details-row" style="display:none;">
+                                                        <td colspan="6">
+                                                            <div class="employee-details-container">
+                                                                <div class="info-section">
+                                                                    <h4>@employee.firstName @employee.lastName</h4>
+                                                                    <div class="d-flex justify-content-between mb-3" style="gap: 10px;">
+                                                                        <div>
+                                                                            <label>Month:</label>
+                                                                            <select class="monthSelect form-select form-select-sm" style="border-radius:5px;">
+                                                                                <option value="1">January</option>
+                                                                                <option value="2">February</option>
+                                                                                <option value="3">March</option>
+                                                                                <option value="4">April</option>
+                                                                                <option value="5">May</option>
+                                                                                <option value="6">June</option>
+                                                                                <option value="7">July</option>
+                                                                                <option value="8">August</option>
+                                                                                <option value="9">September</option>
+                                                                                <option value="10">October</option>
+                                                                                <option value="11">November</option>
+                                                                                <option value="12">December</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div>
+                                                                            <label>Cut-off:</label>
+                                                                            <select class="cutoffSelect form-select form-select-sm" style="border-radius:5px;">
+                                                                                <option value="9-23">9 - 23</option>
+                                                                                <option value="24-8">24 - 8</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button class="btn btn-outline-info btn-sm mb-md-2" onclick="downloadEmployeeDTR('@employee.employeeId', this)">
+                                                                        <i class="bi bi-download"></i> Download DTR
+                                                                    </button>
+
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-bordered">
+                                                                            <thead style="background: #4646a3; color: white;">
+                                                                                <tr>
+                                                                                    <th rowspan="2">Date</th>
+                                                                                    <th colspan="2">Morning</th>
+                                                                                    <th colspan="2">Afternoon</th>
+                                                                                    <th rowspan="2">Work Mode</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th>Time In</th>
+                                                                                    <th>Break In</th>
+                                                                                    <th>Break Out</th>
+                                                                                    <th>Time Out</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @if (Model.dtrRecords.Any(d => d.employeeId == employee.employeeId))
+                                                                                {
+                                                                                    foreach (var dtr in Model.dtrRecords.Where(d => d.employeeId == employee.employeeId))
+                                                                                    {
+                                                                                        <tr data-date="@dtr.date.ToString("yyyy-MM-dd")">
+                                                                                            <td>@dtr.date.ToString("MM/dd/yyyy")</td>
+                                                                                            <td class="@(dtr.timeIn.HasValue && dtr.timeIn.Value.TimeOfDay > new TimeSpan(8, 5, 0) ? "late-time" : "")">
+                                                                                                @(dtr.timeIn.HasValue ? dtr.timeIn.Value.ToString("hh:mm tt") : "")
+                                                                                            </td>
+                                                                                            <td>@(dtr.breakIn.HasValue ? dtr.breakIn.Value.ToString("hh:mm tt") : "N/A")</td>
+                                                                                            <td>@(dtr.breakOut.HasValue ? dtr.breakOut.Value.ToString("hh:mm tt") : "N/A")</td>
+                                                                                            <td>@(dtr.timeOut.HasValue ? dtr.timeOut.Value.ToString("hh:mm tt") : "N/A")</td>
+                                                                                            <td>@dtr.workMode</td>
+                                                                                        </tr>
+                                                                                    }
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td colspan="6" class="text-center">No DTR records found</td>
+                                                                                    </tr>
+                                                                                }
+                                                                                <!-- Add this row to always be present for JS filtering -->
+                                                                                <tr class="no-records">
+                                                                                    <td colspan="6" class="text-center">No DTR records found</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    @*<button class="btn btn-primary btn-sm edit-button" onclick="editInfo('@employee.employeeId')">✏ Edit Info</button>*@
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Pagination Controls -->
+                                    <div class="mt-3 text-center">
+                                        <button id="prevPage" class="btn btn-secondary btn-sm">Previous</button>
+                                        <button id="nextPage" class="btn btn-secondary btn-sm">Next</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let currentPage = 1;
+    let rowsPerPage = 5;
+    let employees = Array.from(document.querySelectorAll(".employee-row"));
+    let details = document.querySelectorAll(".details-row");
+    let filteredEmployees = [...employees]; // Keeps track of filtered employees
+
+    function displayPage(page) {
+        let start = (page - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+
+        employees.forEach(row => row.style.display = "none"); // Hide all rows
+        filteredEmployees.slice(start, end).forEach(row => row.style.display = ""); // Show only required rows
+
+        details.forEach(row => row.style.display = "none"); // Hide all details by default
+
+        document.getElementById("prevPage").disabled = page === 1;
+        document.getElementById("nextPage").disabled = page >= Math.ceil(filteredEmployees.length / rowsPerPage);
+    }
+
+    document.getElementById("prevPage").addEventListener("click", function () {
+        if (currentPage > 1) {
+            currentPage--;
+            displayPage(currentPage);
+        }
+    });
+
+    document.getElementById("nextPage").addEventListener("click", function () {
+        if (currentPage < Math.ceil(filteredEmployees.length / rowsPerPage)) {
+            currentPage++;
+            displayPage(currentPage);
+        }
+    });
+
+    displayPage(currentPage);
+
+    // 🔍 Universal Search (Filters all fields)
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let searchText = this.value.toLowerCase().trim();
+
+        if (searchText === "") {
+            filteredEmployees = [...employees]; // Reset when search is cleared
+        } else {
+            filteredEmployees = employees.filter(row =>
+                row.innerText.toLowerCase().includes(searchText)
+            );
+        }
+
+        currentPage = 1; // Reset to first page after filtering
+        displayPage(currentPage);
+    });
+
+    // 🔽 Toggle Details Row (Only Show One at a Time)
+    window.toggleDetails = function (id) {
+        let row = document.getElementById(id);
+
+        // Hide all other details rows
+        document.querySelectorAll(".details-row").forEach(r => {
+            if (r !== row) r.style.display = "none";
+        });
+
+        // Toggle the clicked row
+        row.style.display = (row.style.display === "none" || row.style.display === "") ? "table-row" : "none";
+    };
+});
+</script>
+
+
+<script>
+function editInfo(employeeId) {
+    window.location.href = "/Admin/EditEmployee?employeeId=" + employeeId;
+}
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        window.toggleDetails = function (id) {
+            const row = document.getElementById(id);
+
+            // Hide all other details rows
+            document.querySelectorAll('.details-row').forEach(r => {
+                if (r !== row) r.style.display = 'none';
+            });
+
+            const isVisible = (row.style.display === 'none' || row.style.display === '');
+            row.style.display = isVisible ? 'table-row' : 'none';
+
+            if (isVisible) {
+                // Find month and cutoff dropdowns and DTR rows inside THIS row
+                const monthSelect = row.querySelector('.monthSelect');
+                const cutoffSelect = row.querySelector('.cutoffSelect');
+                const dtrRows = row.querySelectorAll('tr[data-date]');
+                const noRecordsRow = row.querySelector('.no-records');
+
+                if (!monthSelect || !cutoffSelect) {
+                    console.error("Dropdowns not found in row:", id);
+                    return;
+                }
+
+                // Get today's date
+                const today = new Date();
+                const currentMonth = today.getMonth() + 1; // JS months are zero-based
+                const currentDay = today.getDate();
+
+                // Determine cutoff based on today's day
+                let cutoffValue = '';
+                if (currentDay >= 9 && currentDay <= 23) {
+                    cutoffValue = '9-23'; // 9 - 23
+                } else {
+                    cutoffValue = '24-8'; // 24 - 8
+                }
+
+                // Set dropdown default values
+                monthSelect.value = currentMonth;
+                cutoffSelect.value = cutoffValue;
+
+                // Filter rows based on defaults
+                filterDtrRows(monthSelect, cutoffSelect, dtrRows, noRecordsRow);
+
+                // Event listeners scoped to this employee row
+                monthSelect.addEventListener('change', () => {
+                    filterDtrRows(monthSelect, cutoffSelect, dtrRows, noRecordsRow);
+                });
+
+                cutoffSelect.addEventListener('change', () => {
+                    filterDtrRows(monthSelect, cutoffSelect, dtrRows, noRecordsRow);
+                });
+            }
+        };
+
+        // Filter DTR rows based on month/cutoff
+        function filterDtrRows(monthSelect, cutoffSelect, dtrRows, noRecordsRow) {
+            const month = parseInt(monthSelect.value);
+            const cutoff = cutoffSelect.value;
+
+            if (!month) {
+                // Hide all if no month is selected
+                dtrRows.forEach(row => row.style.display = 'none');
+                showNoRecordsMessage(noRecordsRow, true);
+                return;
+            }
+
+            let visibleCount = 0;
+
+            dtrRows.forEach(row => {
+                const dateStr = row.getAttribute('data-date');
+                const rowDate = parseDate(dateStr);
+                const rowMonth = rowDate.getMonth() + 1;
+                const rowDay = rowDate.getDate();
+
+                let isVisible = false;
+
+                if (cutoff === '9-23') {
+                    // 9 - 23
+                    if (rowMonth === month && rowDay >= 9 && rowDay <= 23) {
+                        isVisible = true;
+                    }
+                } else if (cutoff === '24-8') {
+                    // 24 - 31 current month OR 1 - 8 next month
+                    if (
+                        (rowMonth === month && rowDay >= 24) ||
+                        (rowMonth === (month === 12 ? 1 : month + 1) && rowDay <= 8)
+                    ) {
+                        isVisible = true;
+                    }
+                }
+
+                row.style.display = isVisible ? '' : 'none';
+
+                if (isVisible) {
+                    visibleCount++;
+                }
+            });
+
+            // Show/hide "No DTR records found" row
+            showNoRecordsMessage(noRecordsRow, visibleCount === 0);
+        }
+
+        // Parse the date from yyyy-mm-dd
+        function parseDate(dateString) {
+            const parts = dateString.split('-');
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
+        // Show/Hide the No Records Row
+        function showNoRecordsMessage(noRecordsRow, shouldShow) {
+            if (!noRecordsRow) return;
+            noRecordsRow.style.display = shouldShow ? '' : 'none';
+        }
+
+        //For Download DTR Per Employee
+    });
+</script>
+<script>
+    function downloadEmployeeDTR(employeeId, button) {
+        const detailsContainer = button.closest('.info-section');
+        const monthSelect = detailsContainer.querySelector('.monthSelect');
+        const cutoffSelect = detailsContainer.querySelector('.cutoffSelect');
+
+        const selectedMonth = monthSelect.value;
+        const selectedCutoff = cutoffSelect.value;
+
+        if (!selectedMonth || !selectedCutoff) {
+            alert('Please select both Month and Cut-off before downloading.');
+            return;
+        }
+
+        const url = `/Admin/DownloadEmployeeDTRExcel?employeeId=${employeeId}&month=${selectedMonth}&cutoff=${selectedCutoff}`;
+
+        // Redirect to download the Excel file
+        window.location.href = url;
+    }
+</script>
+<script>
+    function downloadAllEmployeeDTR() {
+        const month = document.getElementById("allMonthSelect").value;
+        const cutoff = document.getElementById("allCutoffSelect").value;
+
+        if (!month || !cutoff) {
+            alert("Please select both Month and Cut-off before downloading.");
+            return;
+        }
+
+        const url = `/Admin/DownloadAllEmployeeDTR?month=${month}&cutoff=${cutoff}`;
+
+        window.location.href = url;
+    }
+
+
+
+</script>

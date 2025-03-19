@@ -1,0 +1,415 @@
+﻿@model Dealogikal.ViewModel.AccountViewModel
+
+
+@{
+    ViewBag.Title = "MyProfile";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<link href="~/Assets/css/MyProfile.css" rel="stylesheet" />
+
+<div class="content-wrapper">
+
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="row">
+                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                </div>
+                <div class="col-12 grid-margin">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="form-sample">
+                                <h3 class="card-description" style="margin-bottom:30px; font-weight:bold; color:black; margin-left:22px;">
+                                    My Profile
+                                </h3>
+                                <div class="profile-info-wrapper">
+                                    <!-- Profile Picture Section -->
+                                    <div class="profile-section">
+                                        <img src="@(!string.IsNullOrEmpty(ViewBag.ProfilePicture) ? Url.Content("~/UploadedFiles/" + ViewBag.ProfilePicture) : Url.Content("~/Assets/img/profile.jpg"))"
+                                             alt="profile" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+                                        <input type="file" id="fileInput" style="display: none;" accept="image/*" />
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editProfileModal">Edit Details</button>
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editPasswordModal" style="margin-top: 10px;">Change Password</button>
+                                    </div>
+
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <strong>Name:</strong>
+                                            <span>@Model.employeeInfo.firstName @Model.employeeInfo.lastName</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <strong>Email:</strong>
+                                            <span>@Model.employeeInfo.email</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <strong>Phone Number:</strong>
+                                            <span>@Model.employeeInfo.phone</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <strong>Address:</strong>
+                                            <span>@Model.employeeInfo.address @Model.employeeInfo.barangay @Model.employeeInfo.city</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <strong>Department:</strong>
+                                            <span>@Model.employeeInfo.department</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <strong>Position:</strong>
+                                            <span>@Model.employeeInfo.position</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <strong>Date of Birth:</strong>
+                                            <span>@(Model.employeeInfo.birthdate.HasValue ? Model.employeeInfo.birthdate.Value.ToString("MMMM dd, yyyy") : "No Information")</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <strong>Date Hired:</strong>
+                                            <span>@(Model.employeeInfo.dateHired == default(DateTime) ? "No Information" : Model.employeeInfo.dateHired.ToString("MMMM dd, yyyy"))</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <!-- Wider modal -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="profileErrorMessage" class="alert alert-danger d-none"></div>
+                <form id="editProfileForm" action="@Url.Action("MyProfile", "Admin")" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-4 text-center d-flex flex-column align-items-center justify-content-center">
+                            <label>Profile Picture</label>
+                            <div class="profile-pic-container">
+                                <img id="profilePreview" src="@(!string.IsNullOrEmpty(ViewBag.ProfilePicture) ? Url.Content("~/UploadedFiles/" + ViewBag.ProfilePicture) : Url.Content("~/Assets/img/profile.jpg"))" alt="Profile Picture"
+                                     class="rounded-circle" style="width: 150px; height: 150px; border: 1px solid #ddd; object-fit: cover;">
+                            </div>
+                            <input type="file" id="profileImageInput" name="profilePicture" class="d-none" accept="image/*">
+                            @Html.ValidationMessage("profilePicture", "", new { @class = "text-danger" })
+                            <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('profileImageInput').click()">
+                                Upload Photo
+                            </button>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="firstName">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" name="firstName" value="@Model.employeeInfo.firstName" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" name="lastName" value="@Model.employeeInfo.lastName" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dateHired">Date Hired</label>
+                                        <input type="date" class="form-control" id="dateHired" name="dateHired" value="@(Model.employeeInfo.dateHired == default(DateTime) ? "" : Model.employeeInfo.dateHired.ToString("yyyy-MM-dd"))" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone Number</label>
+                                        <input type="text" class="form-control" id="phone" name="phone" value="@Model.employeeInfo.phone" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address">Address</label>
+                                        <input type="text" class="form-control" id="address" name="address" value="@Model.employeeInfo.address" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="barangay">Barangay</label>
+                                        <input type="text" class="form-control" id="barangay" name="barangay" value="@Model.employeeInfo.barangay" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="department">Department</label>
+                                        <input type="text" class="form-control" id="department" name="department" value="@Model.employeeInfo.department" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="position">Position</label>
+                                        <input type="text" class="form-control" id="position" name="position" value="@Model.employeeInfo.position" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="birthdate">Date of Birth</label>
+                                        <input type="date" class="form-control" id="birthdate" name="birthdate" value="@(Model.employeeInfo.birthdate.HasValue ? Model.employeeInfo.birthdate.Value.ToString("yyyy-MM-dd") : "")" readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" value="@Model.employeeInfo.email" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <input type="text" class="form-control" id="city" name="city" value="@Model.employeeInfo.city" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="corporation">Corporation</label>
+                                        <input type="text" class="form-control" id="corporation" name="corporation" value="@Model.employeeInfo.corporation" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" form="editProfileForm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Change Password Modal -->
+<div class="modal fade" id="editPasswordModal" tabindex="-1" role="dialog" aria-labelledby="editPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="display:flex; flex-direction:column; width:100%;">
+            <form id="changePasswordForm" action="@Url.Action("ChangePassword", "Admin")" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPasswordModalLabel">Change Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Old Password -->
+                    <div class="form-group">
+                        <label for="oldPassword">Old Password</label>
+                        <input type="password" class="form-control" id="oldPassword" name="OldPassword" placeholder="Enter your old password" required style="min-width:100%;">
+                    </div>
+                    <!-- New Password -->
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="NewPassword" placeholder="Enter your new password" required style="min-width:100%;">
+                    </div>
+                    <!-- Confirm New Password -->
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmNewPassword" name="ConfirmNewPassword" placeholder="Confirm your new password" required style="min-width:100%;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Image Preview -->
+<script>
+    document.getElementById('profileImageInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const maxWidth = 1000;
+        const maxHeight = 1000;
+        const maxFileSize = 10 * 1024 * 1024; // 10MB
+
+        if (!file) return;
+
+        const allowedExtensions = ['jpg', 'jpeg', 'png'];
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        // Check file type
+        if (!allowedExtensions.includes(fileExtension)) {
+            showToast('Invalid file type. Only JPG and PNG files are allowed.', 'error');
+            event.target.value = '';
+            return;
+        }
+
+        // Check file size
+        if (file.size > maxFileSize) {
+            showToast('File size exceeds 10MB.', 'error');
+            event.target.value = '';
+            return;
+        }
+
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            img.src = e.target.result;
+        };
+
+        img.onload = function () {
+            let width = img.width;
+            let height = img.height;
+
+            // If the image is larger than allowed, resize it
+            if (width > maxWidth || height > maxHeight) {
+                const canvas = document.createElement('canvas');
+                let scale = Math.min(maxWidth / width, maxHeight / height);
+                width = width * scale;
+                height = height * scale;
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Compress the image to JPEG format (quality 0.8)
+                canvas.toBlob(function (blob) {
+                    if (blob.size > maxFileSize) {
+                        showToast('Even after resizing, file size exceeds 10MB.', 'error');
+                        event.target.value = '';
+                        return;
+                    }
+
+                    const resizedUrl = URL.createObjectURL(blob);
+                    document.getElementById('profilePreview').src = resizedUrl;
+
+                    // We need to append this new blob as file to form submission
+                    uploadResizedImage(blob);
+
+                    showToast('Image ready to upload!', 'success');
+
+                }, 'image/jpeg', 0.8); // Compress to JPEG with 80% quality
+
+            } else {
+                // If the image is within size limits, just show the preview and use original file
+                document.getElementById('profilePreview').src = img.src;
+
+                // Original file will be uploaded
+                uploadOriginalFile(file);
+
+                showToast('Image ready to upload!', 'success');
+            }
+        };
+
+        img.onerror = function () {
+            showToast('Invalid image file.', 'error');
+            event.target.value = '';
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+
+    function uploadResizedImage(blob) {
+        const fileInput = document.getElementById('profileImageInput');
+        const dataTransfer = new DataTransfer();
+
+        const file = new File([blob], 'resized-profile.jpg', { type: 'image/jpeg' });
+        dataTransfer.items.add(file);
+
+        // Attach the new file to the input (replacing the old one)
+        fileInput.files = dataTransfer.files;
+    }
+
+    function uploadOriginalFile(file) {
+        const fileInput = document.getElementById('profileImageInput');
+        const dataTransfer = new DataTransfer();
+
+        dataTransfer.items.add(file);
+
+        // Attach the original file to the input
+        fileInput.files = dataTransfer.files;
+    }
+
+
+    document.getElementById('profileImageInput').addEventListener('change', function(event) {
+    // ... your main image resize logic here ...
+});
+
+        function uploadResizedImage(blob) {
+            const fileInput = document.getElementById('profileImageInput');
+            const dataTransfer = new DataTransfer();
+
+            const file = new File([blob], 'resized-profile.jpg', { type: 'image/jpeg' });
+            dataTransfer.items.add(file);
+
+            // Attach the new file to the input (replacing the old one)
+            fileInput.files = dataTransfer.files;
+        }
+
+        function uploadOriginalFile(file) {
+            const fileInput = document.getElementById('profileImageInput');
+            const dataTransfer = new DataTransfer();
+
+            dataTransfer.items.add(file);
+
+            // Attach the original file to the input
+            fileInput.files = dataTransfer.files;
+        }
+
+        function showToast(message, icon) {
+            // SweetAlert2 toast code here
+        }
+</script>
+<script>
+    function showToast(message, icon) {
+    Swal.fire({
+        toast: true,
+        position: 'bottom-start', // bottom left
+        icon: icon,               // success / error / warning / info / question
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: false,
+        customClass: {
+            popup: 'swal2-border-radius'
+        },
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+}
+</script>
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        var passwordField = document.getElementById("password");
+        var icon = this.querySelector("i");
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        } else {
+            passwordField.type = "password";
+            icon.classList.remove("bi-eye-slash");
+            icon.classList.add("bi-eye");
+        }
+    });
+</script>
+
+<script>
+    document.getElementById("clearForm").addEventListener("click", function() {
+        document.querySelectorAll(".form-sample input, .form-sample select").forEach(field => {
+            if (field.type !== "submit" && field.type !== "button") {
+                field.value = "";
+            }
+        });
+    });
+</script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                showToast("@TempData["Success"]", "success");
+            </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                showToast("@TempData["Error"]", "error");
+            </text>
+        }
+    });
+</script>

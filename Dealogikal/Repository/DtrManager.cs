@@ -1,0 +1,209 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Dealogikal.Database;
+using Dealogikal.Utils;
+
+namespace Dealogikal.Repository
+{
+    public class DtrManager
+    {
+        private BaseRepository<dtrRecords> _dtrRecords;
+
+
+        public DtrManager()
+        {
+            _dtrRecords = new BaseRepository<dtrRecords>();
+        }
+        public dtrRecords GetRecordsByRecordId(int recordId)
+        {
+            return _dtrRecords.Get(recordId);
+        }
+        public dtrRecords GetRecordsByEmployeeId(string employeeId)
+        {
+            return _dtrRecords._table.FirstOrDefault(e => e.employeeId == employeeId);
+        }
+
+        public dtrRecords GetCurrentRecord(int recordId)
+        {
+            return _dtrRecords._table.FirstOrDefault(r => r.recordId == recordId && r.date == DateTime.Now);
+        }
+        public List<dtrRecords> GetAllDtr()
+        {
+            return _dtrRecords.GetAll();
+        }
+        public List<dtrRecords> GetAllDtrDesc()
+        {
+            return _dtrRecords.GetAll().OrderByDescending(d => d.createdAt).ToList();
+        }
+
+        public List<dtrRecords> GetDtrHistoryByEmployeeId(string employeeId)
+        {
+            return _dtrRecords._table.Where(e => e.employeeId == employeeId).OrderByDescending(e => e.date).ToList();
+        }
+
+        public List<dtrRecords> GetEmployeeDTR(string employeeId, int month, string cutoff)
+        {
+            // Get today's year or pass as parameter if needed
+            int year = DateTime.Now.Year;
+
+            var startDate = new DateTime(year, month, 1);
+
+            DateTime cutoffStartDate;
+            DateTime cutoffEndDate;
+
+            if (cutoff == "9-23")
+            {
+                // 9 - 23 of the selected month
+                cutoffStartDate = new DateTime(startDate.Year, startDate.Month, 9);
+                cutoffEndDate = new DateTime(startDate.Year, startDate.Month, 23);
+            }
+            else
+            {
+                // 24 - end of selected month and 1 - 8 of next month
+                cutoffStartDate = new DateTime(startDate.Year, startDate.Month, 24);
+
+                if (month == 12)
+                {
+                    cutoffEndDate = new DateTime(startDate.Year + 1, 1, 8);
+                }
+                else
+                {
+                    cutoffEndDate = new DateTime(startDate.Year, startDate.Month + 1, 8);
+                }
+            }
+
+            // Query from _dtrRecords._table (BaseRepository LINQ IQueryable)
+            var records = _dtrRecords._table
+                .Where(d => d.employeeId == employeeId &&
+                            d.date >= cutoffStartDate &&
+                            d.date <= cutoffEndDate)
+                .OrderBy(d => d.date)
+                .ToList();
+
+            return records;
+        }
+
+
+        public ErrorCode UpdateDtr(dtrRecords dtr, ref string errMsg)
+        {
+            return _dtrRecords.Update(dtr.recordId, dtr, out errMsg);
+        }
+        public ErrorCode CreateDtr(dtrRecords dtr, string employeeId, ref string errMsg)
+        {
+            try
+            {
+                DateTime serverTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Singapore Standard Time");
+
+                dtr.employeeId = employeeId;
+                dtr.createdAt = serverTime.Date;
+                dtr.date = serverTime.Date;
+                dtr.timeIn = serverTime;
+
+                if (_dtrRecords.Create(dtr, out errMsg) != ErrorCode.Success)
+                {
+                    return ErrorCode.Error;
+                }
+
+                return ErrorCode.Success;
+
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+        public ErrorCode UpdateBreakIn(string employeeId, int recordId, ref string errMsg)
+        {
+            try
+            {
+                DateTime serverTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Singapore Standard Time");
+
+                var record = GetRecordsByRecordId(recordId);
+                if (record == null)
+                {
+                    errMsg = "No record found for Break In.";
+                    return ErrorCode.Error;
+                }
+                record.breakIn = serverTime;
+                return _dtrRecords.Update(recordId, record, out errMsg);
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+        public ErrorCode UpdateBreakOut(string employeeId, int recordId, string workmode, ref string errMsg)
+        {
+            try
+            {
+                DateTime serverTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Singapore Standard Time");
+
+                dtrRecords record = null;
+                // If recordId is greater than 0, try to retrieve the record.
+                if (recordId > 0)
+                {
+                    record = GetRecordsByRecordId(recordId);
+                }
+
+                if (record == null)
+                {
+                    // No record exists for today (e.g. no TimeIn), so create a new record for the afternoon.
+                    var newRecord = new dtrRecords();
+                    newRecord.employeeId = employeeId;
+                    newRecord.createdAt = serverTime.Date;
+                    newRecord.date = serverTime.Date;
+                    newRecord.workMode = workmode;
+                    // Optionally, you might leave TimeIn and BreakIn as null
+                    newRecord.breakOut = serverTime;
+                    // You can also set other fields if needed
+                    return _dtrRecords.Create(newRecord, out errMsg);
+                }
+                else
+                {
+                    // If a record exists, simply update the BreakOut time.
+                    record.breakOut = serverTime;
+                    return _dtrRecords.Update(record.recordId, record, out errMsg);
+                }
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+
+        public ErrorCode UpdateTimeOut(string employeeId, int recordId, ref string errMsg)
+        {
+            try
+            {
+                DateTime serverTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Singapore Standard Time");
+
+                var record = GetRecordsByRecordId(recordId);
+
+                if (record == null)
+                {
+                    errMsg = "No Time In record found for today.";
+                    return ErrorCode.Error;
+                }
+
+                // Update the timeOut field
+                record.timeOut = serverTime;
+
+                // Update the record in the database
+                return _dtrRecords.Update(recordId, record, out errMsg);
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+    }
+}
