@@ -144,6 +144,7 @@
     <Content Include="Assets\css\Dashboard.css" />
     <Content Include="Assets\css\MyProfile.css" />
     <Content Include="Assets\css\vertical-layout-light\style.css" />
+    <Content Include="Assets\img\123.png" />
     <Content Include="Assets\img\404\404.svg" />
     <Content Include="Assets\img\404\astronaut.svg" />
     <Content Include="Assets\img\404\bg_purple.png" />
@@ -154,13 +155,27 @@
     <Content Include="Assets\img\404\purple.jpg" />
     <Content Include="Assets\img\404\rocket.svg" />
     <Content Include="Assets\img\background.jpg" />
+    <Content Include="Assets\img\CreateEmployeeForm.png" />
+    <Content Include="Assets\img\Dashboard.png" />
     <Content Include="Assets\img\dealogikal-logo-mini.png" />
     <Content Include="Assets\img\dealogikal-logo.ico" />
     <Content Include="Assets\img\dealogikal-logo.png" />
+    <Content Include="Assets\img\DownloadAllEmployeeDTR.png" />
+    <Content Include="Assets\img\DownloadEmployeeDTR.png" />
+    <Content Include="Assets\img\DTR.png" />
+    <Content Include="Assets\img\EditDetails.png" />
+    <Content Include="Assets\img\EditProfileForm.png" />
     <Content Include="Assets\img\fuel.jpg" />
     <Content Include="Assets\img\kpec-logo-mini.png" />
     <Content Include="Assets\img\kpec-logo.png" />
+    <Content Include="Assets\img\Login.png" />
+    <Content Include="Assets\img\MyProfile.png" />
+    <Content Include="Assets\img\OvertimeRequestForm.png" />
+    <Content Include="Assets\img\PendingLeaveRequest.png" />
+    <Content Include="Assets\img\PendingOvertimeRequest.png" />
     <Content Include="Assets\img\profile.jpg" />
+    <Content Include="Assets\img\SendFeedback.png" />
+    <Content Include="Assets\img\SendFeedbackForm.png" />
     <Content Include="Assets\js\ace.js" />
     <Content Include="Assets\js\alerts.js" />
     <Content Include="Assets\js\avgrund.js" />
@@ -1338,6 +1353,7 @@
     <Compile Include="Repository\FeedbackManager.cs" />
     <Compile Include="Repository\IBaseRepository.cs" />
     <Compile Include="Repository\ImageManager.cs" />
+    <Compile Include="Repository\MailManager.cs" />
     <Compile Include="Repository\NotificationManager.cs" />
     <Compile Include="Repository\RequestManager.cs" />
     <Compile Include="Utils\Roles.cs" />
@@ -1502,6 +1518,9 @@
     <Content Include="scripts\umd\popper-utils.min.js.map" />
     <Content Include="scripts\umd\popper.js.map" />
     <Content Include="scripts\umd\popper.min.js.map" />
+    <Content Include="Views\Home\ConfirmationPassword.cshtml" />
+    <Content Include="Views\Home\ForgotPassword.cshtml" />
+    <Content Include="Views\Home\VerifyCode.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

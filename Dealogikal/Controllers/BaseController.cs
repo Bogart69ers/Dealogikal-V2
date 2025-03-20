@@ -18,6 +18,7 @@ namespace Dealogikal.Controllers
         public ImageManager _ImgManager;
         public FeedbackManager _FeedbackManager;
         public NotificationManager _NotifManager;
+        public MailManager _MailManager;
 
         public BaseController()
         {
@@ -28,6 +29,7 @@ namespace Dealogikal.Controllers
             _ImgManager = new ImageManager();
             _FeedbackManager = new FeedbackManager();
             _NotifManager = new NotificationManager();
+            _MailManager = new MailManager();
         }
 
         private string GetAvatarUrl(string employeeId)

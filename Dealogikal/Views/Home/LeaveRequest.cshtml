@@ -80,18 +80,27 @@
                         <div class="card-body d-flex flex-column pb-4">
                             <!-- Added extra bottom padding -->
                             <!-- Leave Count -->
-                            <div class="leave-count-container text-center mb-4">
-                                <div class="leave-count-card">
-                                    <p class="leave-count-title">Total Leave Count:</p>
-                                    <p class="leave-count-number">@LeaveCount</p>
-
-                                    <p class="leave-count-title" style="margin-top: 10px;">Pending Leave With Pay Days:</p>
-                                    <p class="leave-count-number">@pendingLeaveDays</p>
-
-                                    <p class="leave-count-title" style="margin-top: 10px;">Available LP Days (After Pending):</p>
-                                    <p class="leave-count-number">@availableLeaveDays</p>
+                            <div class="row leave-count-container text-center mb-4">
+                                <div class="col-md-4">
+                                    <div class="leave-count-card">
+                                        <p class="leave-count-title">Remaining Leave <br />Count</p>
+                                        <p class="leave-count-number">@LeaveCount</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="leave-count-card">
+                                        <p class="leave-count-title">Pending Request With Pay (Day/s)</p>
+                                        <p class="leave-count-number">@pendingLeaveDays</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="leave-count-card">
+                                        <p class="leave-count-title">Available Leave (After Pending)</p>
+                                        <p class="leave-count-number">@availableLeaveDays</p>
+                                    </div>
                                 </div>
                             </div>
+
 
 
                             <!-- Search Bar -->
@@ -157,11 +166,9 @@
 
             </div>
             <style>
-                .leave-count-container {
+                .leave-count-container .col-md-4 {
                     display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    margin-top: 20px;
+                    margin-bottom: 10px;
                 }
 
                 .leave-count-card {
@@ -169,16 +176,30 @@
                     border-radius: 10px;
                     padding: 20px;
                     text-align: center;
-                    width: 150px;
                     color: white;
-                    font-size: 18px;
+                    font-size: 16px; /* Slightly smaller for better fit */
                     font-weight: bold;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    min-height: 150px; /* You can adjust this to match the height you prefer */
+                    width: 100%;
+                    height: 100%;
+                    align-items: center;
+                }
+
+                .leave-count-title {
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                    flex-grow: 1;
                 }
 
                 .leave-count-number {
                     font-size: 32px;
                     font-weight: bold;
                 }
+
+
                 /* Ensure table responsiveness */
                 .table-container {
                     width: 100%;

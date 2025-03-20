@@ -980,5 +980,241 @@ namespace Dealogikal.Controllers
             return View();
 
         }
+
+        [AllowAnonymous]     
+        public ActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult ForgotPassword(string email)
+        {
+            var user = _AccManager.GetEmployeebyemail(email);
+
+            if (user == null)
+            {
+                TempData["Error"] = "There is no account associated with that email. Try again.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            var userAcc = _AccManager.GetEmployeebyEmployeeId(user.employeeId);
+
+            if (userAcc != null)
+            {
+                // Generate a verification code (e.g., 6 digits)
+                var random = new Random();
+                string verificationCode = random.Next(100000, 999999).ToString();
+
+                // Save the code and employeeId temporarily
+                Session["VerificationCode"] = verificationCode;
+                Session["VerificationUserId"] = user.employeeId;
+                Session["VerificationEmail"] = email;
+                Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5); 
+
+
+                // Send email
+                string errorMessage = "";
+                var mailManager = new MailManager();  // Your MailManager instance
+                string subject = "Your Password Reset Verification Code";
+                string body = $"<p>Hello {user.firstName},</p>" +
+                              $"<p>Your verification code is: <strong>{verificationCode}</strong></p>" +
+                              "<p>Please enter this code to proceed with resetting your password.</p>" +
+                              "<p>Thank you!</p>";
+
+                bool isSent = mailManager.SendEmail(email, subject, body, ref errorMessage);
+
+                if (!isSent)
+                {
+                    TempData["Error"] = "Failed to send verification email: " + errorMessage;
+                    return RedirectToAction("ForgotPassword");
+                }
+
+                TempData["Success"] = "Verification code sent to your email. Please check your inbox.";
+                return RedirectToAction("VerifyCode");
+            }
+
+            TempData["Error"] = "Something went wrong.";
+            return RedirectToAction("ForgotPassword");
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult ResendCode()
+        {
+            var employeeId = Session["VerificationUserId"] as string;
+            var email = Session["VerificationEmail"] as string;
+
+            if (string.IsNullOrEmpty(employeeId) || string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "Session expired. Please try again.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            var user = _AccManager.GetEmployeebyEmployeeId(employeeId);
+
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            var random = new Random();
+            string verificationCode = random.Next(100000, 999999).ToString();
+
+            Session["VerificationCode"] = verificationCode;
+            Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5); // 5 min expiry
+
+            string errorMessage = "";
+            var mailManager = new MailManager();
+            string subject = "Your New Verification Code";
+            string body = $"<p>Hello {user.firstName},</p>" +
+                          $"<p>Your new verification code is: <strong>{verificationCode}</strong></p>" +
+                          "<p>This code will expire in 5 minutes.</p>";
+
+            bool isSent = mailManager.SendEmail(email, subject, body, ref errorMessage);
+
+            if (!isSent)
+            {
+                TempData["Error"] = "Failed to resend code: " + errorMessage;
+            }
+            else
+            {
+                TempData["Success"] = "A new verification code has been sent to your email.";
+            }
+
+            return RedirectToAction("VerifyCode");
+        }
+
+
+
+        [AllowAnonymous]
+        public ActionResult VerifyCode()
+        {
+            var expiresAt = Session["VerificationCodeExpiresAt"] as DateTime?;
+
+            if (Session["VerificationUserId"] == null)
+            {
+                TempData["Error"] = "Session expired. Please try again.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            ViewBag.ExpiresAt = expiresAt.Value.ToString("o"); 
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult VerifyCode(string code)
+        {
+            string sessionCode = Session["VerificationCode"] as string;
+            string employeeId = Session["VerificationUserId"] as string;
+            DateTime? expiresAt = Session["VerificationCodeExpiresAt"] as DateTime?;
+
+
+            if (string.IsNullOrEmpty(sessionCode) || string.IsNullOrEmpty(employeeId) || !expiresAt.HasValue)
+            {
+                TempData["Error"] = "Session expired. Please try again.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            if (DateTime.Now > expiresAt.Value)
+            {
+                TempData["Error"] = "Your verification code has expired. Please request a new one.";
+                // Optionally clear session here
+                Session.Remove("VerificationCode");
+                Session.Remove("VerificationUserId");
+                Session.Remove("VerificationCodeExpiresAt");
+                return RedirectToAction("ForgotPassword");
+            }
+
+            // Check if the code matches
+            if (code != sessionCode)
+            {
+                TempData["Error"] = "Invalid verification code. Please try again.";
+                return RedirectToAction("VerifyCode");
+            }
+
+            // Code is valid, clear the session if you like
+            Session.Remove("VerificationCode"); // Optional: remove the code after successful verification
+            Session.Remove("VerificationCodeExpiresAt");
+
+            // Proceed to confirmation password page
+            return RedirectToAction("ConfirmationPassword", new { id = employeeId });
+        }
+
+
+
+        [AllowAnonymous]
+        public ActionResult ConfirmationPassword(string id)
+        {
+            var sessionUserId = Session["VerificationUserId"] as string;
+
+            if (string.IsNullOrEmpty(sessionUserId) || sessionUserId != id)
+            {
+                TempData["Error"] = "Unauthorized access or session expired.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            var model = new AccountViewModel
+            {
+                userAccount = _AccManager.GetUserByEmployeeId(id)
+            };
+
+            ViewBag.UserId = id;
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult ConfirmationPassword(string employeeId, string password, string confirmpassword)
+        {
+            string errorMsg = string.Empty;
+
+            // Basic validation
+            if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirmpassword))
+            {
+                TempData["Error"] = "Password and Confirm Password are required.";
+                return RedirectToAction("ConfirmationPassword", new { id = employeeId });
+            }
+
+            if (password != confirmpassword)
+            {
+                TempData["Error"] = "Passwords do not match.";
+                return RedirectToAction("ConfirmationPassword", new { id = employeeId });
+            }
+
+            // Get the user account
+            var user = _AccManager.GetUserByEmployeeId(employeeId);
+
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            // Hash the new password
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            user.password = hashedPassword;
+
+            // Update the user in the database
+            var result = _AccManager.UpdateUser(user, ref errorMsg);
+
+            if (result == ErrorCode.Success)
+            {
+                TempData["Success"] = "Password reset successful. You may now log in with your new password.";
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                TempData["Error"] = "Failed to reset password: " + errorMsg;
+                return RedirectToAction("ConfirmationPassword", new { id = employeeId });
+            }
+        }
+
+
     }
 }
