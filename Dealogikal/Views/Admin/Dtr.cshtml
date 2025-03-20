@@ -6,11 +6,11 @@
 }
 
 <div class="content-wrapper">
-    <h3 class="font-weight-bold" style="margin-left:3%;">Daily Time Record</h3>
+    <h3 class="font-weight-bold">Daily Time Record</h3>
 
     <div class="card-body" style="background-color:white; min-height:490px; border-radius:20px; padding: 20px;">
         <!-- Search Bar -->
-        <input type="text" id="searchInput" class="form-control mb-3 w-25" placeholder="Search Employees..." style="margin-left: 75%">
+        <input type="text" id="searchTable" class="form-control mb-3" placeholder="Search...">
 
         <!-- Scrollable Table -->
         <div class="table-responsive" style="max-height: 400px; overflow-y: auto; text-align: center;">
@@ -89,6 +89,7 @@
         border: 1px solid #ccc;
         border-radius: 5px;
         outline: none;
+        max-width:280px;
     }
 
     .sortable {
@@ -153,5 +154,6 @@
         });
     });
 </script>
+
 
 

@@ -1018,10 +1018,53 @@ namespace Dealogikal.Controllers
                 string errorMessage = "";
                 var mailManager = new MailManager();  // Your MailManager instance
                 string subject = "Your Password Reset Verification Code";
-                string body = $"<p>Hello {user.firstName},</p>" +
-                              $"<p>Your verification code is: <strong>{verificationCode}</strong></p>" +
-                              "<p>Please enter this code to proceed with resetting your password.</p>" +
-                              "<p>Thank you!</p>";
+                string body = $@"
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                              <meta charset='UTF-8'>
+                              <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                              <title>Verification Code</title>
+                            </head>
+                            <body style='margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;'>
+                              <table align='center' border='0' cellpadding='0' cellspacing='0' width='600' style='border-collapse: collapse; background-color: #ffffff; margin-top: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.1);'>
+                                <tr>
+                                  <td align='center' bgcolor='#cfd0d1' style='padding: 30px 0;'>
+                                    <img src='https://www.dealogikal.com/images/dealogikal_dark.png' alt='Dealogikal Logo' width='200' style='display: block;' />
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style='padding: 40px 30px 20px 30px;'>
+                                    <h2 style='color: #333333; text-align: center;'>Password Reset Verification</h2>
+                                    <p style='color: #666666; font-size: 16px; text-align: center;'>Hello {user.firstName},</p>
+                                    <p style='color: #666666; font-size: 16px; text-align: center;'>
+                                      We received a request to reset your password. Use the verification code below to proceed:
+                                    </p>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td align='center' style='padding: 20px 30px;'>
+                                    <p style='font-size: 32px; color: #ffffff; background-color: #2596be; display: inline-block; padding: 15px 25px; border-radius: 5px; letter-spacing: 5px;'>
+                                      {verificationCode}
+                                    </p>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style='padding: 20px 30px;'>
+                                    <p style='color: #666666; font-size: 14px;'>
+                                      If you did not request a password reset, you can safely ignore this email. This code will expire in 5 minutes.
+                                    </p>
+                                    <p style='color: #666666; font-size: 14px;'>Thank you,<br />The Dealogikal Team</p>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td bgcolor='#cfd0d1' style='padding: 20px; color: #ffffff; text-align: center; font-size: 12px;'>
+                                    &copy; {DateTime.Now.Year} Dealogikal. All rights reserved.
+                                  </td>
+                                </tr>
+                              </table>
+                            </body>
+                            </html>";
 
                 bool isSent = mailManager.SendEmail(email, subject, body, ref errorMessage);
 
@@ -1069,9 +1112,53 @@ namespace Dealogikal.Controllers
             string errorMessage = "";
             var mailManager = new MailManager();
             string subject = "Your New Verification Code";
-            string body = $"<p>Hello {user.firstName},</p>" +
-                          $"<p>Your new verification code is: <strong>{verificationCode}</strong></p>" +
-                          "<p>This code will expire in 5 minutes.</p>";
+            string body = $@"
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                          <meta charset='UTF-8'>
+                          <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                          <title>Verification Code</title>
+                        </head>
+                        <body style='margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;'>
+                          <table align='center' border='0' cellpadding='0' cellspacing='0' width='600' style='border-collapse: collapse; background-color: #ffffff; margin-top: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.1);'>
+                            <tr>
+                              <td align='center' bgcolor='#cfd0d1' style='padding: 30px 0;'>
+                                <img src='https://www.dealogikal.com/images/dealogikal_dark.png' alt='Dealogikal Logo' width='200' style='display: block;' />
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style='padding: 40px 30px 20px 30px;'>
+                                <h2 style='color: #333333; text-align: center;'>Password Reset Verification</h2>
+                                <p style='color: #666666; font-size: 16px; text-align: center;'>Hello {user.firstName},</p>
+                                <p style='color: #666666; font-size: 16px; text-align: center;'>
+                                  We received a request to reset your password. Use the verification code below to proceed:
+                                </p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td align='center' style='padding: 20px 30px;'>
+                                <p style='font-size: 32px; color: #ffffff; background-color: #2596be; display: inline-block; padding: 15px 25px; border-radius: 5px; letter-spacing: 5px;'>
+                                  {verificationCode}
+                                </p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style='padding: 20px 30px;'>
+                                <p style='color: #666666; font-size: 14px;'>
+                                  If you did not request a password reset, you can safely ignore this email. This code will expire in 5 minutes.
+                                </p>
+                                <p style='color: #666666; font-size: 14px;'>Thank you,<br />The Dealogikal Team</p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td bgcolor='#cfd0d1' style='padding: 20px; color: #ffffff; text-align: center; font-size: 12px;'>
+                                &copy; {DateTime.Now.Year} Dealogikal. All rights reserved.
+                              </td>
+                            </tr>
+                          </table>
+                        </body>
+                        </html>";
 
             bool isSent = mailManager.SendEmail(email, subject, body, ref errorMessage);
 
@@ -1206,7 +1293,7 @@ namespace Dealogikal.Controllers
             if (result == ErrorCode.Success)
             {
                 TempData["Success"] = "Password reset successful. You may now log in with your new password.";
-                return RedirectToAction("Login");
+                return RedirectToAction("ConfirmationPassword", new { id = employeeId });
             }
             else
             {
