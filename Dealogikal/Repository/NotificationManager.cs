@@ -43,7 +43,7 @@ namespace Dealogikal.Repository
                     notif.isRead = true;
                 }
 
-                return _notif.Save(out errMsg); // ✅ Make sure your repository Save method matches this!
+                return _notif.Save(out errMsg); 
             }
             catch (Exception ex)
             {
@@ -103,7 +103,6 @@ namespace Dealogikal.Repository
 
         public ErrorCode UpdateNotification(notification nt, out string errMsg)
         {
-            // You pass in the entity's ID, etc.
             return _notif.Update(nt.id, nt, out errMsg);
         }
     }

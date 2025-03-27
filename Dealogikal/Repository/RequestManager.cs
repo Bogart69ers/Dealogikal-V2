@@ -55,11 +55,11 @@ namespace Dealogikal.Repository
         {
             return _overtReq.GetAll();
         }
-        public List<overtimeRequest> GetAllOvertimeRequestsDesc() // Better naming
+        public List<overtimeRequest> GetAllOvertimeRequestsDesc() 
         {
             return _overtReq.GetAll()
-                .OrderBy(l => l.status != 0) // status 0 first (false < true)
-                .ThenByDescending(l => l.dateFiled) // newest dateFiled first
+                .OrderBy(l => l.status != 0) 
+                .ThenByDescending(l => l.dateFiled) 
                 .ToList();
         }
 

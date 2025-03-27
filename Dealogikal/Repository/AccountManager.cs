@@ -142,7 +142,6 @@ namespace Dealogikal.Repository
 
         public ErrorCode SignIn(string employeeId, string password, ref string errMsg)
         {
-            // ✅ Get the user by employee ID
             var userSignIn = GetUserByEmployeeId(employeeId);
 
             if (userSignIn == null)
@@ -153,18 +152,14 @@ namespace Dealogikal.Repository
 
             bool isPasswordCorrect = false;
 
-            // ✅ Check if the stored password is hashed (starts with $2, $2a, $2b)
             if (userSignIn.password.StartsWith("$2"))
             {
-                // Hashed password: Verify using BCrypt
                 isPasswordCorrect = BCrypt.Net.BCrypt.Verify(password, userSignIn.password);
             }
             else
             {
-                // Legacy plain-text password check
                 isPasswordCorrect = userSignIn.password.Equals(password);
 
-                // OPTIONAL: Upgrade to hashed password if it was plain text and correct
                 if (isPasswordCorrect)
                 {
                     userSignIn.password = BCrypt.Net.BCrypt.HashPassword(password);
@@ -229,7 +224,7 @@ namespace Dealogikal.Repository
             try
             {
                 var empInfo = GetEmployeebyEmployeeId(employeeId);
-                if (empInfo != null) // Ensure empInfo is not null before accessing its properties
+                if (empInfo != null) 
                 {
                     if (empInfo.employeeId == employeeId && empInfo.firstName == firstname && empInfo.lastName == lastname)
                     {

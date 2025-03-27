@@ -21,8 +21,8 @@ namespace Dealogikal.Repository
         public List<feedback> GetAllFeedbackDesc()
         {
             return _feedback.GetAll()
-                            .OrderBy(l => l.status != 0) // status 0 first (false < true)
-                            .ThenByDescending(l => l.dateCreated) // newest dateFiled first
+                            .OrderBy(l => l.status != 0) 
+                            .ThenByDescending(l => l.dateCreated) 
                             .ToList();
         }
 

@@ -34,7 +34,7 @@ namespace Dealogikal.Controllers
             ViewBag.Name = user.firstName;
 
             var today = DateTime.Now.Date;
-            var lateThreshold = new TimeSpan(8, 0, 0); // 8:00 AM cutoff
+            var lateThreshold = new TimeSpan(8, 0, 0); 
 
             var lateEmployeesCount = _DtrManager.GetAllDtr()
                  .Where(dtr => dtr.date == today &&
@@ -79,7 +79,6 @@ namespace Dealogikal.Controllers
                     return Json(new { success = false, message = "Feedback data is null." });
                 }
 
-                // Manually set the dateCreated since it is not submitted from the form
                 fb.dateCreated = DateTime.Now;
                 fb.status = 0;
 
@@ -151,8 +150,8 @@ namespace Dealogikal.Controllers
 
             var model = new AccountViewModel
             {
-                employeeInfos = employees ?? new List<employeeInfo>(),  // ✅ Null-safe
-                images = images ?? new List<images>()                   // ✅ Null-safe
+                employeeInfos = employees ?? new List<employeeInfo>(),  
+                images = images ?? new List<images>()                   
             };
 
             return View(model);
@@ -211,7 +210,6 @@ namespace Dealogikal.Controllers
 
             if (action == "TimeIn")
             {
-                // Create a new record for the morning Time In.
                 result = _DtrManager.CreateDtr(dtr, currentUser, ref errMsg);
                 if (result != ErrorCode.Success)
                 {
@@ -221,7 +219,6 @@ namespace Dealogikal.Controllers
             }
             else if (action == "BreakIn")
             {
-                // Update the current record with Break In time.
                 if (recordId.HasValue)
                 {
                     result = _DtrManager.UpdateBreakIn(currentUser, recordId.Value, ref errMsg);
@@ -248,7 +245,6 @@ namespace Dealogikal.Controllers
             }
             else if (action == "TimeOut")
             {
-                // Update the current record with Time Out.
                 if (recordId.HasValue)
                 {
                     result = _DtrManager.UpdateTimeOut(currentUser, recordId.Value, ref errMsg);
@@ -329,7 +325,6 @@ namespace Dealogikal.Controllers
             {
                 var currentUser = User.Identity.Name;
 
-                // Retrieve the existing employee and user records
                 var image = _ImgManager.GetImagebyEmployeeId(currentUser);
                 var employee = _AccManager.GetEmployeebyEmployeeId(currentUser);
                 var user = _AccManager.GetUserByEmployeeId(currentUser);
@@ -340,7 +335,6 @@ namespace Dealogikal.Controllers
                     return View();
                 }
 
-                // Profile Picture Upload Handling
                 if (profilePicture != null && profilePicture.ContentLength > 0)
                 {
                     var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
@@ -356,7 +350,7 @@ namespace Dealogikal.Controllers
                         var oldImagePath = Path.Combine(uploadsFolderPath, image.imageFile);
                         if (System.IO.File.Exists(oldImagePath))
                         {
-                            System.IO.File.Delete(oldImagePath); // **Deletes old profile picture**
+                            System.IO.File.Delete(oldImagePath);
                         }
                     }
                     profilePicture.SaveAs(profileSavePath);
@@ -386,7 +380,6 @@ namespace Dealogikal.Controllers
                     }
                 }
 
-                // Update Employee Information ONLY IF new values are provided
                 employee.phone = !string.IsNullOrEmpty(phone) ? phone : employee.phone;
                 employee.email = !string.IsNullOrEmpty(email) ? email : employee.email;
                 employee.address = !string.IsNullOrEmpty(address) ? address : employee.address;
@@ -421,7 +414,6 @@ namespace Dealogikal.Controllers
             string initials = $"{employee.firstName?.FirstOrDefault()}{employee.lastName?.FirstOrDefault()}".ToUpper();
             string monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
 
-            // Get the cutoff date range
             List<DateTime> cutoffDates = GenerateCutoffDates(month, cutoff);
             int year = cutoffDates.First().Year;
 
@@ -429,12 +421,10 @@ namespace Dealogikal.Controllers
             {
                 var worksheet = workbook.Worksheets.Add(initials);
 
-                // TITLE ROW
                 worksheet.Range("B1:J1").Merge().Value = "Bi-Weekly TimeSheet Calculator";
                 worksheet.Cell("B1").Style.Font.SetBold().Font.FontSize = 16;
                 worksheet.Cell("B1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                // Corporation Name (conditional)
                 var corporationName = employee.corporation == "KPEC"
                     ? "Knotical Power and Energy Corporation"
                     : "DEALOGIKAL CORP.";
@@ -443,7 +433,6 @@ namespace Dealogikal.Controllers
                 worksheet.Cell("B2").Style.Font.SetBold();
                 worksheet.Cell("B2").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                // EMPLOYEE INFO
                 worksheet.Cell("C3").Value = "Employee Name:";
                 worksheet.Range("D3:H3").Merge().Value = $"{employee.firstName} {employee.lastName}";
 
@@ -475,7 +464,6 @@ namespace Dealogikal.Controllers
                 worksheet.Range("D11:E11").Merge().Value = "Morning";
                 worksheet.Range("F11:G11").Merge().Value = "Afternoon";
 
-                // HEADERS
                 worksheet.Cell(startRow, 2).Value = "Day";
                 worksheet.Cell(startRow, 3).Value = "Date";
                 worksheet.Cell(startRow, 4).Value = "Time In";
@@ -496,7 +484,6 @@ namespace Dealogikal.Controllers
 
                 int row = startRow + 1;
 
-                // Create a dictionary for quick lookup of DTR records by date
                 var dtrDict = dtrRecords.ToDictionary(d => d.date.Date, d => d);
 
                 foreach (var date in cutoffDates)
@@ -511,7 +498,6 @@ namespace Dealogikal.Controllers
 
                     if (isSunday)
                     {
-                        // Sunday: Always weekend, no attendance even if there’s DTR
                         worksheet.Cell(row, 4).Value = "WEEKEND";
                         worksheet.Cell(row, 5).Value = "--";
                         worksheet.Cell(row, 6).Value = "--";
@@ -542,7 +528,6 @@ namespace Dealogikal.Controllers
                         }
                         else
                         {
-                            // Saturday without DTR ➡️ Mark as WEEKEND
                             worksheet.Cell(row, 4).Value = "WEEKEND";
                             worksheet.Cell(row, 5).Value = "--";
                             worksheet.Cell(row, 6).Value = "--";
@@ -554,7 +539,6 @@ namespace Dealogikal.Controllers
                     }
                     else
                     {
-                        // Normal weekdays (Mon to Fri)
                         if (dtrDict.TryGetValue(date.Date, out dtr))
                         {
                             worksheet.Cell(row, 4).Value = dtr.timeIn.HasValue ? dtr.timeIn.Value : (DateTime?)null;
@@ -584,7 +568,6 @@ namespace Dealogikal.Controllers
                         }
                     }
 
-                    // Center align the whole row (Day to Break columns)
                     worksheet.Range(row, 2, row, 8).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                     int endRow = row - 1;
                     worksheet.Range("B11:H27").Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -595,11 +578,11 @@ namespace Dealogikal.Controllers
 
                 worksheet.Columns().AdjustToContents();
 
-                worksheet.Column(4).Width += 5; // Time In
-                worksheet.Column(5).Width += 5; // Break In
-                worksheet.Column(6).Width += 5; // Break Out
-                worksheet.Column(7).Width += 5; // Time Out
-                worksheet.Column(8).Width += 3; // Break
+                worksheet.Column(4).Width += 5;
+                worksheet.Column(5).Width += 5; 
+                worksheet.Column(6).Width += 5; 
+                worksheet.Column(7).Width += 5; 
+                worksheet.Column(8).Width += 3; 
 
 
                 using (var stream = new MemoryStream())
@@ -616,7 +599,7 @@ namespace Dealogikal.Controllers
         private List<DateTime> GenerateCutoffDates(int month, string cutoff)
         {
             List<DateTime> dates = new List<DateTime>();
-            int year = DateTime.Now.Year; // Default year (or pass it from the front end)
+            int year = DateTime.Now.Year; 
 
             if (cutoff == "9-23")
             {
@@ -648,7 +631,7 @@ namespace Dealogikal.Controllers
         [Authorize]
         public ActionResult DownloadAllEmployeeDTR(int month, string cutoff)
         {
-            var allEmployees = _AccManager.GetAllEmployee(); // Assuming this returns List<EmployeeInfo>
+            var allEmployees = _AccManager.GetAllEmployee(); 
             if (allEmployees == null || !allEmployees.Any())
             {
                 TempData["Error"] = "No employees found.";
@@ -662,17 +645,13 @@ namespace Dealogikal.Controllers
             {
                 foreach (var employee in allEmployees)
                 {
-                    // Get DTR records for the employee
                     var dtrRecords = _DtrManager.GetEmployeeDTR(employee.employeeId, month, cutoff);
 
-                    // Generate cutoff dates
                     var cutoffDates = GenerateCutoffDates(month, cutoff);
                     int sheetYear = cutoffDates.First().Year;
 
-                    // Sheet name: initials (FN + LN)
                     string initials = $"{employee.firstName?.FirstOrDefault()}{employee.lastName?.FirstOrDefault()}".ToUpper();
 
-                    // Ensure unique worksheet names (important if initials repeat)
                     var sheetName = initials;
                     int counter = 1;
                     while (workbook.Worksheets.Any(ws => ws.Name == sheetName))
@@ -683,15 +662,12 @@ namespace Dealogikal.Controllers
 
                     var worksheet = workbook.Worksheets.Add(sheetName);
 
-                    // DTR Dictionary for quick lookup
                     var dtrDict = dtrRecords.ToDictionary(d => d.date.Date, d => d);
 
-                    // ----------- Header Info -----------
                     worksheet.Range("B1:J1").Merge().Value = "Bi-Weekly TimeSheet Calculator";
                     worksheet.Cell("B1").Style.Font.SetBold().Font.FontSize = 16;
                     worksheet.Cell("B1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                    // Corporation Name (conditional)
                     var corporationName = employee.corporation == "KPEC"
                         ? "Knotical Power and Energy Corporation"
                         : "DEALOGIKAL CORP.";
@@ -724,7 +700,6 @@ namespace Dealogikal.Controllers
                     worksheet.Range(7, 3, 7, 4).Style.Fill.BackgroundColor = XLColor.FromHtml("#DDEBF7");
 
 
-                    // ----------- Table Headers -----------
                     int startRow = 12;
                     worksheet.Range("D11:E11").Merge().Value = "Morning";
                     worksheet.Range("F11:G11").Merge().Value = "Afternoon";
@@ -745,7 +720,6 @@ namespace Dealogikal.Controllers
 
                     int row = startRow + 1;
 
-                    // ----------- Populate DTR Records -----------
                     foreach (var date in cutoffDates)
                     {
                         worksheet.Cell(row, 2).Value = date.DayOfWeek.ToString();
@@ -828,18 +802,17 @@ namespace Dealogikal.Controllers
                         row++;
                     }
 
-                    // Optional: Add borders dynamically to populated area
                     int endRow = row - 1;
                     worksheet.Range($"B11:H{endRow}").Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
                     worksheet.Range($"B11:H{endRow}").Style.Border.InsideBorder = XLBorderStyleValues.Thin;
 
                     worksheet.Columns().AdjustToContents();
 
-                    worksheet.Column(4).Width += 5; // Time In
-                    worksheet.Column(5).Width += 5; // Break In
-                    worksheet.Column(6).Width += 5; // Break Out
-                    worksheet.Column(7).Width += 5; // Time Out
-                    worksheet.Column(8).Width += 3; // Break
+                    worksheet.Column(4).Width += 5; 
+                    worksheet.Column(5).Width += 5;
+                    worksheet.Column(6).Width += 5; 
+                    worksheet.Column(7).Width += 5; 
+                    worksheet.Column(8).Width += 3; 
 
                 }
 
@@ -888,7 +861,6 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("Accounts");
                 }
 
-                // Update profile picture if uploaded
                 if (profilePicture != null && profilePicture.ContentLength > 0)
                 {
                     var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
@@ -925,7 +897,6 @@ namespace Dealogikal.Controllers
                     }
                 }
 
-                // Update employee fields (conditionally to prevent overwriting)
                 employee.firstName = !string.IsNullOrEmpty(firstName) ? firstName : employee.firstName;
                 employee.lastName = !string.IsNullOrEmpty(lastName) ? lastName : employee.lastName;
                 employee.phone = !string.IsNullOrEmpty(phone) ? phone : employee.phone;
@@ -983,7 +954,7 @@ namespace Dealogikal.Controllers
         [Authorize]
         public ActionResult ChangePassword(string OldPassword, string NewPassword, string ConfirmNewPassword)
         {
-            var employeeId = User.Identity.Name; // This is your EmployeeID
+            var employeeId = User.Identity.Name; 
             string errorMsg = string.Empty;
 
             if (string.IsNullOrWhiteSpace(OldPassword) || string.IsNullOrWhiteSpace(NewPassword) || string.IsNullOrWhiteSpace(ConfirmNewPassword))
@@ -1006,14 +977,13 @@ namespace Dealogikal.Controllers
                 return RedirectToAction("MyProfile");
             }
 
-            // ✅ Verify old password (check if it is hashed or plain)
             bool isOldPasswordCorrect = false;
 
-            if (userAccount.password.StartsWith("$2")) // bcrypt hashed
+            if (userAccount.password.StartsWith("$2"))
             {
                 isOldPasswordCorrect = BCrypt.Net.BCrypt.Verify(OldPassword, userAccount.password);
             }
-            else // Plaintext fallback (in case you have legacy passwords)
+            else 
             {
                 isOldPasswordCorrect = userAccount.password == OldPassword;
             }
@@ -1024,7 +994,6 @@ namespace Dealogikal.Controllers
                 return RedirectToAction("MyProfile");
             }
 
-            // ✅ Hash and update the new password
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(NewPassword);
             userAccount.password = hashedPassword;
 
@@ -1045,6 +1014,63 @@ namespace Dealogikal.Controllers
         {
             return View();
         }
+
+        [Authorize(Roles = "HR")]
+        public ActionResult NotifyHR_EmployeesWithNoTimeoutYesterday()
+        {
+            DateTime yesterday = DateTime.Today.AddDays(-1);
+            string errMsg = "";
+            int notificationsSent = 0;
+
+            var incompleteDtrs = _DtrManager.GetAllDtr()
+                .Where(dtr => dtr.date == yesterday && dtr.timeIn != null && dtr.timeOut == null)
+                .ToList();
+
+            var hrEmployees = _AccManager.GetAllEmployee()
+                .Where(emp => emp.department.ToLower().Contains("hr"))
+                .ToList();
+
+            foreach (var dtr in incompleteDtrs)
+            {
+                var employee = _AccManager.GetEmployeebyEmployeeId(dtr.employeeId);
+                if (employee == null) continue;
+
+                foreach (var hr in hrEmployees)
+                {
+                    bool alreadyExists = _NotifManager.GetNotificationByemployeeId(hr.employeeId)
+                        .Any(n =>
+                            n.message.Contains(employee.employeeId) &&
+                            n.createdAt.HasValue &&
+                            n.createdAt.Value.Date == yesterday &&
+                            n.title == "Missing Timeout Detected");
+
+                    if (!alreadyExists)
+                    {
+                        var result = _NotifManager.CreateNotification(
+                            employeeId: hr.employeeId,
+                            senderId: dtr.employeeId,
+                            title: "Missing Timeout Detected",
+                            message: $"Employee {employee.firstName} {employee.lastName} (ID: {employee.employeeId}) failed to timeout on {yesterday:MMMM dd, yyyy}.",
+                            ref errMsg
+                        );
+
+                        if (result == ErrorCode.Success)
+                        {
+                            notificationsSent++;
+                        }
+                    }
+                }
+            }
+
+            return Json(new
+            {
+                success = true,
+                message = $"HR notified of {notificationsSent} missing timeout incident(s)."
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+
+
 
     }
 }

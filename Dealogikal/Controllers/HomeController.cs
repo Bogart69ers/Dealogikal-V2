@@ -22,7 +22,7 @@ namespace Dealogikal.Controllers
 
             if (user == null)
             {
-                return RedirectToAction("Login", "Home"); // Redirect to login if no user is found
+                return RedirectToAction("Login", "Home"); 
             }
 
             switch (user.role1.roleName)
@@ -34,7 +34,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("Dashboard", "Home");
 
                 default:
-                    return RedirectToAction("Login", "Home"); // Handle unexpected roles
+                    return RedirectToAction("Login", "Home"); 
             }
         }
 
@@ -79,50 +79,43 @@ namespace Dealogikal.Controllers
                     return View();
                 }
 
-                // Check if account is inactive
                 if (info.status == 0)
                 {
                     return RedirectToAction("InActiveAccount", "Home");
                 }
 
-                // Create Authentication Ticket
                 FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(
                     1,
                     employeeId,
                     DateTime.Now,
-                    rememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddMinutes(30), // Remember me logic
+                    rememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddMinutes(30),  
                     rememberMe,
                     "",
                     FormsAuthentication.FormsCookiePath
                 );
 
-                // Encrypt the ticket
                 string encryptedTicket = FormsAuthentication.Encrypt(ticket);
 
-                // Create authentication cookie
                 HttpCookie authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket)
                 {
-                    Expires = rememberMe ? ticket.Expiration : DateTime.MinValue, // Expire when session ends if not persistent
-                    HttpOnly = true, // Prevent JavaScript access
-                    Secure = Request.IsSecureConnection // Ensures HTTPS-only transmission
+                    Expires = rememberMe ? ticket.Expiration : DateTime.MinValue, 
+                    HttpOnly = true, 
+                    Secure = Request.IsSecureConnection 
                 };
 
                 Response.Cookies.Add(authCookie);
 
-                // Redirect if returnUrl is valid
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
                     return Redirect(returnUrl);
                 }
 
-                // Validate User Role
                 if (user.role1 == null)
                 {
                     ViewBag.Error = "User role is not defined.";
                     return View();
                 }
 
-                // Redirect Based on Role
                 return user.role == 1 ? RedirectToAction("AdminDashboard", "Admin") : RedirectToAction("Dashboard", "Home");
             }
 
@@ -170,7 +163,6 @@ namespace Dealogikal.Controllers
 
             if (action == "TimeIn")
             {
-                // Create a new record for the morning Time In.
                 result = _DtrManager.CreateDtr(dtr, currentUser, ref errMsg);
                 if (result != ErrorCode.Success)
                 {
@@ -180,7 +172,6 @@ namespace Dealogikal.Controllers
             }
             else if (action == "BreakIn")
             {
-                // Update the current record with Break In time.
                 if (recordId.HasValue)
                 {
                     result = _DtrManager.UpdateBreakIn(currentUser, recordId.Value, ref errMsg);
@@ -207,7 +198,6 @@ namespace Dealogikal.Controllers
             }
             else if (action == "TimeOut")
             {
-                // Update the current record with Time Out.
                 if (recordId.HasValue)
                 {
                     result = _DtrManager.UpdateTimeOut(currentUser, recordId.Value, ref errMsg);
@@ -236,7 +226,6 @@ namespace Dealogikal.Controllers
 
             int leaveCount = user?.leaveCount ?? 0;
 
-            // Pending leavewithpay requests
             var pendingLPRequests = _RequestManager.GetLeaveRequestByEmployeeId(currentUserId)
                 .Where(r => r.status == 0 && r.leaveType == "leavewithpay")
                 .ToList();
@@ -421,15 +410,14 @@ namespace Dealogikal.Controllers
                     return View("OvertimeRequest");
                 }
 
-                // 🔔 Notify Department Head
                 var notifManager = new NotificationManager();
                 var deptHead = _AccManager.GetDepartmentHeadByDepartment(userInfo.department);
 
                 if (deptHead != null)
                 {
                     notifManager.CreateNotification(
-                        deptHead.employeeId,                    // receiver
-                        userInfo.employeeId,                    // sender (the employee making the request)
+                        deptHead.employeeId,                  
+                        userInfo.employeeId,                   
                         "Pending Overtime Request",
                         $"{userInfo.firstName} {userInfo.lastName} has submitted an overtime request.",
                         ref errMsg
@@ -547,12 +535,10 @@ namespace Dealogikal.Controllers
                         return RedirectToAction("LeaveApproval");
                     }
 
-                    // Get other pending leavewithpay requests (excluding the one we're approving)
                     var otherPendingLPRequests = _RequestManager.GetLeaveRequestByEmployeeId(request.employeeId)
                         .Where(r => r.status == 0 && r.leaveType == "leavewithpay" && r.requestId != requestId)
                         .ToList();
 
-                    // Safely calculate reserved days
                     int reservedDays = otherPendingLPRequests.Sum(r =>
                     {
                         if (!r.leaveStart.HasValue || !r.leaveEnd.HasValue)
@@ -561,11 +547,9 @@ namespace Dealogikal.Controllers
                         return (r.leaveEnd.Value - r.leaveStart.Value).Days + 1;
                     });
 
-                    // ✅ Safely get leave count (handle nulls)
                     int leaveCount = userInfo.leaveCount ?? 0;
                     int availableLPDays = leaveCount - reservedDays;
 
-                    // ✅ Validate leave start and end dates
                     if (!request.leaveStart.HasValue || !request.leaveEnd.HasValue)
                     {
                         ViewBag.Error = "Leave request dates are incomplete.";
@@ -574,14 +558,12 @@ namespace Dealogikal.Controllers
 
                     int requestedLPDays = (request.leaveEnd.Value - request.leaveStart.Value).Days + 1;
 
-                    // ✅ Revalidate before approving
                     if (requestedLPDays > availableLPDays)
                     {
                         ViewBag.Error = $"Cannot approve request. Employee only has {availableLPDays} Leave With Pay days remaining after other pending requests.";
                         return RedirectToAction("LeaveApproval");
                     }
 
-                    // ✅ Deduct leave days from employee's leaveCount
                     var deductResult = _AccManager.UpdateEmployeeLeaveCount(request.employeeId, requestedLPDays, ref errMsg);
                     if (deductResult != ErrorCode.Success)
                     {
@@ -590,15 +572,28 @@ namespace Dealogikal.Controllers
                     }
                 }
 
-                // ✅ Approve the leave request
                 result = _RequestManager.ApproveLeaveRequest(employeeId, requestId, ref errMsg);
+
                 if (result != ErrorCode.Success)
                 {
                     ViewBag.Error = "Error approving leave request: " + errMsg;
                     return RedirectToAction("LeaveApproval");
                 }
 
-                // ✅ Notify the employee
+
+                var user = _AccManager.GetEmployeebyEmployeeId(request.employeeId);
+
+                _MailManager.LeaveApprovalEmail(
+                    user.email,
+                    user.firstName,
+                    request.leaveRequestType,
+                    request.leaveStart.Value,
+                    request.leaveEnd.Value,
+                    request.status.Value,
+                    ref errMsg,
+                    user.corporation
+                );
+
                 _NotifManager.CreateNotification(
                     request.employeeId,
                     User.Identity.Name,
@@ -624,7 +619,6 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("LeaveApproval");
                 }
 
-                // ✅ Notify employee of decline
                 _NotifManager.CreateNotification(
                     request.employeeId,
                     User.Identity.Name,
@@ -675,7 +669,6 @@ namespace Dealogikal.Controllers
 
             if (action == "Accept")
             {
-                // ✅ Approve the overtime request
                 result = _RequestManager.ApproveOvertimeRequest(employeeId, requestId, ref errMsg);
                 if (result != ErrorCode.Success)
                 {
@@ -683,10 +676,9 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("OvertimeApproval");
                 }
 
-                // ✅ Notify Employee of Approval
                 _NotifManager.CreateNotification(
-                    employeeId,                            // receiver
-                    User.Identity.Name,                    // sender (the department head approving)
+                    employeeId,                            
+                    User.Identity.Name,                   
                     "Overtime Request Approved",
                     "Your overtime request has been approved by the Department Head.",
                     ref errMsg
@@ -695,7 +687,6 @@ namespace Dealogikal.Controllers
             }
             else if (action == "Decline")
             {
-                // ✅ Decline the overtime request
                 result = _RequestManager.DeclineOvertimeRequest(employeeId, requestId, ref errMsg);
                 if (result != ErrorCode.Success)
                 {
@@ -703,10 +694,9 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("OvertimeApproval");
                 }
 
-                // ✅ Notify Employee of Decline
                 _NotifManager.CreateNotification(
-                    employeeId,                            // receiver
-                    User.Identity.Name,                    // sender (the department head declining)
+                    employeeId,                           
+                    User.Identity.Name,                  
                     "Overtime Request Declined",
                     "Your overtime request has been declined by the Department Head.",
                     ref errMsg
@@ -743,7 +733,6 @@ namespace Dealogikal.Controllers
             {
                 var currentUser = User.Identity.Name;
 
-                // Retrieve the existing employee and user records
                 var image = _ImgManager.GetImagebyEmployeeId(currentUser);
                 var employee = _AccManager.GetEmployeebyEmployeeId(currentUser);
                 var user = _AccManager.GetUserByEmployeeId(currentUser);
@@ -754,7 +743,6 @@ namespace Dealogikal.Controllers
                     return View();
                 }
 
-                // Profile Picture Upload Handling
                 if (profilePicture != null && profilePicture.ContentLength > 0)
                 {
                     var uploadsFolderPath = Server.MapPath("~/UploadedFiles/");
@@ -770,7 +758,7 @@ namespace Dealogikal.Controllers
                         var oldImagePath = Path.Combine(uploadsFolderPath, image.imageFile);
                         if (System.IO.File.Exists(oldImagePath))
                         {
-                            System.IO.File.Delete(oldImagePath); // **Deletes old profile picture**
+                            System.IO.File.Delete(oldImagePath); 
                         }
                     }
                     profilePicture.SaveAs(profileSavePath);
@@ -800,7 +788,6 @@ namespace Dealogikal.Controllers
                     }
                 }
 
-                // Update Employee Information ONLY IF new values are provided
                 employee.phone = !string.IsNullOrEmpty(phone) ? phone : employee.phone;
                 employee.email = !string.IsNullOrEmpty(email) ? email : employee.email;
                 employee.address = !string.IsNullOrEmpty(address) ? address : employee.address;
@@ -831,7 +818,6 @@ namespace Dealogikal.Controllers
                     return Json(new { success = false, message = "Feedback data is null." });
                 }
 
-                // Manually set the dateCreated since it is not submitted from the form
                 fb.dateCreated = DateTime.Now;
                 fb.status = 0;
 
@@ -917,7 +903,7 @@ namespace Dealogikal.Controllers
         [Authorize]
         public ActionResult ChangePassword(string OldPassword, string NewPassword, string ConfirmNewPassword)
         {
-            var employeeId = User.Identity.Name; // This is your EmployeeID
+            var employeeId = User.Identity.Name; 
             string errorMsg = string.Empty;
 
             if (string.IsNullOrWhiteSpace(OldPassword) || string.IsNullOrWhiteSpace(NewPassword) || string.IsNullOrWhiteSpace(ConfirmNewPassword))
@@ -940,14 +926,13 @@ namespace Dealogikal.Controllers
                 return RedirectToAction("MyProfile");
             }
 
-            // ✅ Verify old password (check if it is hashed or plain)
             bool isOldPasswordCorrect = false;
 
-            if (userAccount.password.StartsWith("$2")) // bcrypt hashed
+            if (userAccount.password.StartsWith("$2")) 
             {
                 isOldPasswordCorrect = BCrypt.Net.BCrypt.Verify(OldPassword, userAccount.password);
             }
-            else // Plaintext fallback (in case you have legacy passwords)
+            else 
             {
                 isOldPasswordCorrect = userAccount.password == OldPassword;
             }
@@ -958,7 +943,6 @@ namespace Dealogikal.Controllers
                 return RedirectToAction("MyProfile");
             }
 
-            // ✅ Hash and update the new password
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(NewPassword);
             userAccount.password = hashedPassword;
 
@@ -1003,20 +987,17 @@ namespace Dealogikal.Controllers
 
             if (userAcc != null)
             {
-                // Generate a verification code (e.g., 6 digits)
                 var random = new Random();
                 string verificationCode = random.Next(100000, 999999).ToString();
 
-                // Save the code and employeeId temporarily
                 Session["VerificationCode"] = verificationCode;
                 Session["VerificationUserId"] = user.employeeId;
                 Session["VerificationEmail"] = email;
                 Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5); 
 
 
-                // Send email
                 string errorMessage = "";
-                var mailManager = new MailManager();  // Your MailManager instance
+                var mailManager = new MailManager(); 
                 string subject = "Your Password Reset Verification Code";
                 string body = $@"
                             <!DOCTYPE html>
@@ -1107,7 +1088,7 @@ namespace Dealogikal.Controllers
             string verificationCode = random.Next(100000, 999999).ToString();
 
             Session["VerificationCode"] = verificationCode;
-            Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5); // 5 min expiry
+            Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5); 
 
             string errorMessage = "";
             var mailManager = new MailManager();
@@ -1209,25 +1190,22 @@ namespace Dealogikal.Controllers
             if (DateTime.Now > expiresAt.Value)
             {
                 TempData["Error"] = "Your verification code has expired. Please request a new one.";
-                // Optionally clear session here
+                
                 Session.Remove("VerificationCode");
                 Session.Remove("VerificationUserId");
                 Session.Remove("VerificationCodeExpiresAt");
                 return RedirectToAction("ForgotPassword");
             }
 
-            // Check if the code matches
             if (code != sessionCode)
             {
                 TempData["Error"] = "Invalid verification code. Please try again.";
                 return RedirectToAction("VerifyCode");
             }
 
-            // Code is valid, clear the session if you like
-            Session.Remove("VerificationCode"); // Optional: remove the code after successful verification
+            Session.Remove("VerificationCode"); 
             Session.Remove("VerificationCodeExpiresAt");
 
-            // Proceed to confirmation password page
             return RedirectToAction("ConfirmationPassword", new { id = employeeId });
         }
 
@@ -1261,7 +1239,6 @@ namespace Dealogikal.Controllers
         {
             string errorMsg = string.Empty;
 
-            // Basic validation
             if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirmpassword))
             {
                 TempData["Error"] = "Password and Confirm Password are required.";
@@ -1274,7 +1251,6 @@ namespace Dealogikal.Controllers
                 return RedirectToAction("ConfirmationPassword", new { id = employeeId });
             }
 
-            // Get the user account
             var user = _AccManager.GetUserByEmployeeId(employeeId);
 
             if (user == null)
@@ -1283,11 +1259,9 @@ namespace Dealogikal.Controllers
                 return RedirectToAction("ForgotPassword");
             }
 
-            // Hash the new password
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
             user.password = hashedPassword;
 
-            // Update the user in the database
             var result = _AccManager.UpdateUser(user, ref errorMsg);
 
             if (result == ErrorCode.Success)

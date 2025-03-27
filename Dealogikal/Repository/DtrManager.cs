@@ -45,7 +45,6 @@ namespace Dealogikal.Repository
 
         public List<dtrRecords> GetEmployeeDTR(string employeeId, int month, string cutoff)
         {
-            // Get today's year or pass as parameter if needed
             int year = DateTime.Now.Year;
 
             var startDate = new DateTime(year, month, 1);
@@ -55,13 +54,11 @@ namespace Dealogikal.Repository
 
             if (cutoff == "9-23")
             {
-                // 9 - 23 of the selected month
                 cutoffStartDate = new DateTime(startDate.Year, startDate.Month, 9);
                 cutoffEndDate = new DateTime(startDate.Year, startDate.Month, 23);
             }
             else
             {
-                // 24 - end of selected month and 1 - 8 of next month
                 cutoffStartDate = new DateTime(startDate.Year, startDate.Month, 24);
 
                 if (month == 12)
@@ -74,7 +71,6 @@ namespace Dealogikal.Repository
                 }
             }
 
-            // Query from _dtrRecords._table (BaseRepository LINQ IQueryable)
             var records = _dtrRecords._table
                 .Where(d => d.employeeId == employeeId &&
                             d.date >= cutoffStartDate &&
@@ -144,7 +140,6 @@ namespace Dealogikal.Repository
                 DateTime serverTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Singapore Standard Time");
 
                 dtrRecords record = null;
-                // If recordId is greater than 0, try to retrieve the record.
                 if (recordId > 0)
                 {
                     record = GetRecordsByRecordId(recordId);
@@ -152,20 +147,17 @@ namespace Dealogikal.Repository
 
                 if (record == null)
                 {
-                    // No record exists for today (e.g. no TimeIn), so create a new record for the afternoon.
                     var newRecord = new dtrRecords();
                     newRecord.employeeId = employeeId;
                     newRecord.createdAt = serverTime.Date;
                     newRecord.date = serverTime.Date;
                     newRecord.workMode = workmode;
-                    // Optionally, you might leave TimeIn and BreakIn as null
                     newRecord.breakOut = serverTime;
-                    // You can also set other fields if needed
+
                     return _dtrRecords.Create(newRecord, out errMsg);
                 }
                 else
                 {
-                    // If a record exists, simply update the BreakOut time.
                     record.breakOut = serverTime;
                     return _dtrRecords.Update(record.recordId, record, out errMsg);
                 }
@@ -192,10 +184,8 @@ namespace Dealogikal.Repository
                     return ErrorCode.Error;
                 }
 
-                // Update the timeOut field
                 record.timeOut = serverTime;
 
-                // Update the record in the database
                 return _dtrRecords.Update(recordId, record, out errMsg);
             }
             catch (Exception ex)
