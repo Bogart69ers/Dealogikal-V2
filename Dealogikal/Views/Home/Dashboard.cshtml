@@ -50,13 +50,10 @@ else
                                 @if (Model.dtr != null && Model.dtr.recordId > 0)
                                 {
                                     <option value="Onsite" @(Model.dtr.workMode == "Onsite" ? "selected" : "")>Onsite</option>
-                                    <option value="WFH" @(Model.dtr.workMode == "WFH" ? "selected" : "")>Work from Home</option>
                                 }
                                 else
                                 {
-                                    <option value="" disabled selected>Work Mode</option>
                                     <option value="Onsite">Onsite</option>
-                                    <option value="WFH">Work from Home</option>
                                 }
                             </select>
 

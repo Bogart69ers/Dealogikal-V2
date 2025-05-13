@@ -49,6 +49,11 @@ namespace Dealogikal.Repository
             return _employeeInf._table.FirstOrDefault(m => m.employeeId == employeeId);
         }
 
+        public employeeInfo GetEmployeebyEmployeeIdOrEmail(string employeeId)
+        {
+            return _employeeInf._table.FirstOrDefault(m => m.employeeId == employeeId || m.email == employeeId);
+        }
+
         public List<employeeInfo> GetEmployeebyEmployeeIdDesc(string employeeId)
         {
             return _employeeInf._table.Where(m => m.employeeId == employeeId).OrderByDescending(e => e.createdAt).ToList();
@@ -142,11 +147,25 @@ namespace Dealogikal.Repository
 
         public ErrorCode SignIn(string employeeId, string password, ref string errMsg)
         {
-            var userSignIn = GetUserByEmployeeId(employeeId);
+
+            userAccount userSignIn = null;
+
+            userSignIn = GetUserByEmployeeId(employeeId);
+            if (userSignIn == null)
+            {
+                // Try finding the employee info by email
+                var empInfo = GetEmployeebyemail(employeeId);
+                if (empInfo != null)
+                {
+                    // Now find the account using employeeId from empInfo
+                    userSignIn = GetUserByEmployeeId(empInfo.employeeId);
+                }
+            }
+
 
             if (userSignIn == null)
             {
-                errMsg = "Employee ID or Password is incorrect";
+                errMsg = "Employee ID or Email or Password is incorrect";
                 return ErrorCode.Error;
             }
 

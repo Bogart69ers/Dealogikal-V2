@@ -27,9 +27,12 @@ namespace Dealogikal.Controllers
         public ActionResult AdminDashboard()
         {
             var user = _AccManager.GetEmployeebyEmployeeId(User.Identity.Name);
-            var dtrRec = _DtrManager.GetRecordsByEmployeeId(user.employeeId);
+            var empId = user.employeeId.Trim();
 
-            var currentDtr = _DtrManager.GetAllDtr().FirstOrDefault(r => r.employeeId == user.employeeId && r.date == DateTime.Now.Date);
+            var currentDtr = _DtrManager.GetAllDtr()
+                .AsEnumerable() // to allow .Date
+                .FirstOrDefault(r => r.employeeId.Trim() == empId && r.date.Date == DateTime.Now.Date);
+
 
             ViewBag.Name = user.firstName;
 
@@ -108,6 +111,8 @@ namespace Dealogikal.Controllers
                 {
                     return View("CreateAccount");
                 }
+
+                ua.employeeId = ua.employeeId?.Replace(" ", "").Trim();
 
                 ua.password = BCrypt.Net.BCrypt.HashPassword(ua.password);
 
@@ -202,13 +207,13 @@ namespace Dealogikal.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult Dtr(dtrRecords dtr, int? recordId, string action)
+        public ActionResult Dtr(dtrRecords dtr, int? recordId, string dtrAction)
         {
             var currentUser = User.Identity.Name;
             string errMsg = string.Empty;
             ErrorCode result;
 
-            if (action == "TimeIn")
+            if (dtrAction == "TimeIn")
             {
                 result = _DtrManager.CreateDtr(dtr, currentUser, ref errMsg);
                 if (result != ErrorCode.Success)
@@ -217,7 +222,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("AdminDashboard");
                 }
             }
-            else if (action == "BreakIn")
+            else if (dtrAction == "BreakIn")
             {
                 if (recordId.HasValue)
                 {
@@ -234,7 +239,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("AdminDashboard");
                 }
             }
-            else if (action == "BreakOut")
+            else if (dtrAction == "BreakOut")
             {
                 result = _DtrManager.UpdateBreakOut(currentUser, recordId.Value, dtr.workMode, ref errMsg);
                 if (result != ErrorCode.Success)
@@ -243,7 +248,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("AdminDashboard");
                 }
             }
-            else if (action == "TimeOut")
+            else if (dtrAction == "TimeOut")
             {
                 if (recordId.HasValue)
                 {
@@ -276,6 +281,7 @@ namespace Dealogikal.Controllers
             return View(model);
         }
 
+       
         [Authorize]
         public ActionResult LeaveRequest()
         {
@@ -1015,62 +1021,46 @@ namespace Dealogikal.Controllers
             return View();
         }
 
-        [Authorize(Roles = "HR")]
-        public ActionResult NotifyHR_EmployeesWithNoTimeoutYesterday()
+        [Authorize]
+        [HttpPost]
+        public JsonResult UpdateEmployeeDTR(dtrRecords model)
         {
-            DateTime yesterday = DateTime.Today.AddDays(-1);
-            string errMsg = "";
-            int notificationsSent = 0;
-
-            var incompleteDtrs = _DtrManager.GetAllDtr()
-                .Where(dtr => dtr.date == yesterday && dtr.timeIn != null && dtr.timeOut == null)
-                .ToList();
-
-            var hrEmployees = _AccManager.GetAllEmployee()
-                .Where(emp => emp.department.ToLower().Contains("hr"))
-                .ToList();
-
-            foreach (var dtr in incompleteDtrs)
+            try
             {
-                var employee = _AccManager.GetEmployeebyEmployeeId(dtr.employeeId);
-                if (employee == null) continue;
-
-                foreach (var hr in hrEmployees)
+                if (model == null || string.IsNullOrEmpty(model.employeeId) || model.date == null)
                 {
-                    bool alreadyExists = _NotifManager.GetNotificationByemployeeId(hr.employeeId)
-                        .Any(n =>
-                            n.message.Contains(employee.employeeId) &&
-                            n.createdAt.HasValue &&
-                            n.createdAt.Value.Date == yesterday &&
-                            n.title == "Missing Timeout Detected");
-
-                    if (!alreadyExists)
-                    {
-                        var result = _NotifManager.CreateNotification(
-                            employeeId: hr.employeeId,
-                            senderId: dtr.employeeId,
-                            title: "Missing Timeout Detected",
-                            message: $"Employee {employee.firstName} {employee.lastName} (ID: {employee.employeeId}) failed to timeout on {yesterday:MMMM dd, yyyy}.",
-                            ref errMsg
-                        );
-
-                        if (result == ErrorCode.Success)
-                        {
-                            notificationsSent++;
-                        }
-                    }
+                    return Json(new { success = false, message = "Invalid DTR data provided." });
                 }
+
+                // Find the existing DTR record
+                var existingDtr = _DtrManager.GetAllDtr()
+                    .FirstOrDefault(d => d.employeeId.Trim() == model.employeeId.Trim() && d.date.Date == model.date.Date);
+
+                if (existingDtr == null)
+                {
+                    return Json(new { success = false, message = "DTR record not found." });
+                }
+
+                // Update the fields
+                existingDtr.timeIn = model.timeIn;
+                existingDtr.breakIn = model.breakIn;
+                existingDtr.breakOut = model.breakOut;
+                existingDtr.timeOut = model.timeOut;
+
+                string errorMsg = string.Empty;
+                var updateResult = _DtrManager.UpdateDtr(existingDtr, ref errorMsg);
+
+                if (updateResult != ErrorCode.Success)
+                {
+                    return Json(new { success = false, message = "Failed to update DTR: " + errorMsg });
+                }
+
+                return Json(new { success = true, message = "DTR updated successfully." });
             }
-
-            return Json(new
+            catch (Exception ex)
             {
-                success = true,
-                message = $"HR notified of {notificationsSent} missing timeout incident(s)."
-            }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
         }
-
-
-
-
     }
 }

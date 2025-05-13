@@ -47,8 +47,8 @@
                     <h3 class="mb-4">Log in</h3>
                     <form action="@Url.Action("Login", "Home")" method="post">
                         <div class="mb-3">
-                            <label for="employeeId" class="form-label">ID Number <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="Employee ID" required>
+                            <label for="employeeId" class="form-label">ID Number/ Email <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="Employee ID/ Email" required>
                         </div>
 
                         <div class="mb-3">
@@ -108,5 +108,21 @@
             icon.classList.remove("bi-eye-slash");
             icon.classList.add("bi-eye");
         }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const empInput = document.getElementById("employeeId");
+
+        empInput.addEventListener("keydown", function (e) {
+            if (e.key === " ") {
+                e.preventDefault();
+            }
+        });
+
+        empInput.addEventListener("input", function () {
+            this.value = this.value.replace(/\s/g, "");
+        });
     });
 </script>

@@ -50,20 +50,17 @@ else
                                 @if (Model.dtr != null && Model.dtr.recordId > 0)
                                 {
                                     <option value="Onsite" @(Model.dtr.workMode == "Onsite" ? "selected" : "")>Onsite</option>
-                                    <option value="WFH" @(Model.dtr.workMode == "WFH" ? "selected" : "")>Work from Home</option>
                                 }
                                 else
                                 {
-                                    <option value="" disabled selected>Work Mode</option>
                                     <option value="Onsite">Onsite</option>
-                                    <option value="WFH">Work from Home</option>
                                 }
                             </select>
 
                             <div class="button-group">
-                                <button type="submit" id="btn1" class="btn btn-inverse-info" name="action" value="">Time In</button>
-                                <button type="submit" id="btn2" class="btn btn-inverse-dark" name="action" value="">Time Out</button>
-
+                                <input type="hidden" name="dtrAction" id="actionInput" value="" />
+                                <button type="button" id="btn1" class="btn btn-inverse-info" data-action="TimeIn">Time In</button>
+                                <button type="button" id="btn2" class="btn btn-inverse-dark" data-action="TimeOut">Time Out</button>
                             </div>
                         </div>
                     </form>
@@ -111,7 +108,7 @@ else
                             @if (Model.dtr != null)
                             {
                                 <tr>
-                                    <td>@Model.dtr.date.ToString("dd MMM yyyy")</td>
+                                     <td>@Model.dtr.date.ToString("dd MMM yyyy")</td>
                                     <td class="@(Model.dtr.timeIn.HasValue && Model.dtr.timeIn.Value.TimeOfDay > new TimeSpan(8, 5, 0) ? "late-time" : "")">
                                         @(Model.dtr.timeIn.HasValue ? Model.dtr.timeIn.Value.ToString("hh:mm tt") : "")
                                     </td>
@@ -153,30 +150,30 @@ else
         var btn2 = $('#btn2');
 
         if (currentHour < 12) {
-            // Morning Shift: Time In & Break In
+            // Morning Shift
             if (!timeInVal) {
                 console.log("Enable Time In Button");
-                btn1.text("Time In").val("TimeIn").prop("disabled", false);
-                btn2.text("Time Out").val("BreakIn").prop("disabled", true);
+                btn1.text("Time In").data("action", "TimeIn").prop("disabled", false);
+                btn2.text("Time Out").data("action", "BreakIn").prop("disabled", true);
             } else if (timeInVal && !breakInVal) {
                 console.log("Enable Break In Button");
                 btn1.prop("disabled", true);
-                btn2.text("Time Out").val("BreakIn").prop("disabled", false);
+                btn2.text("Time Out").data("action", "BreakIn").prop("disabled", false);
             } else {
                 console.log("Disable Morning Buttons");
                 btn1.prop("disabled", true);
                 btn2.prop("disabled", true);
             }
         } else {
-            // Afternoon Shift: Break Out & Time Out
+            // Afternoon Shift
             if (!breakOutVal) {
                 console.log("Enable Break Out Button");
-                btn1.text("Time In").val("BreakOut").prop("disabled", false);
-                btn2.text("Time Out").val("TimeOut").prop("disabled", true);
+                btn1.text("Time In").data("action", "BreakOut").prop("disabled", false);
+                btn2.text("Time Out").data("action", "TimeOut").prop("disabled", true);
             } else if (breakOutVal && !timeOutVal) {
                 console.log("Enable Time Out Button");
                 btn1.prop("disabled", true);
-                btn2.text("Time Out").val("TimeOut").prop("disabled", false);
+                btn2.text("Time Out").data("action", "TimeOut").prop("disabled", false);
             } else {
                 console.log("Disable Afternoon Buttons");
                 btn1.prop("disabled", true);
@@ -185,10 +182,17 @@ else
         }
     }
 
+
     // Run button update on page load
     $(document).ready(function () {
         updateButtons();
         setInterval(updateButtons, 1000);
+
+        $('#btn1, #btn2').on('click', function () {
+            const action = $(this).data('action');
+            $('#actionInput').val(action);
+            $(this).closest('form').submit();
+        });
     });
 </script>
 

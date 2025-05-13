@@ -63,16 +63,13 @@ namespace Dealogikal.Controllers
                 return View();
             }
 
+            employeeId = employeeId?.Replace(" ", "").Trim();
+
+
             if (_AccManager.SignIn(employeeId, password, ref ErrorMessage) == ErrorCode.Success)
             {
-                var user = _AccManager.GetUserByEmployeeId(employeeId);
-                if (user == null)
-                {
-                    ViewBag.Error = "User not found";
-                    return View();
-                }
-
-                var info = _AccManager.GetEmployeebyEmployeeId(employeeId);
+                // Always get employee info by email or ID (loginInput can be either)
+                var info = _AccManager.GetEmployeebyEmployeeIdOrEmail(employeeId);
                 if (info == null)
                 {
                     ViewBag.Error = "Employee information not found";
@@ -84,11 +81,25 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("InActiveAccount", "Home");
                 }
 
+                // Get user account by employeeId (now that we have it from info)
+                var user = _AccManager.GetUserByEmployeeId(info.employeeId);
+                if (user == null)
+                {
+                    ViewBag.Error = "User account not found.";
+                    return View();
+                }
+
+                if (user.role1 == null)
+                {
+                    ViewBag.Error = "User role is not defined.";
+                    return View();
+                }
+
                 FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(
                     1,
-                    employeeId,
+                    info.employeeId,
                     DateTime.Now,
-                    rememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddMinutes(30),  
+                    rememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddMinutes(30),
                     rememberMe,
                     "",
                     FormsAuthentication.FormsCookiePath
@@ -98,9 +109,9 @@ namespace Dealogikal.Controllers
 
                 HttpCookie authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket)
                 {
-                    Expires = rememberMe ? ticket.Expiration : DateTime.MinValue, 
-                    HttpOnly = true, 
-                    Secure = Request.IsSecureConnection 
+                    Expires = rememberMe ? ticket.Expiration : DateTime.MinValue,
+                    HttpOnly = true,
+                    Secure = Request.IsSecureConnection
                 };
 
                 Response.Cookies.Add(authCookie);
@@ -110,13 +121,9 @@ namespace Dealogikal.Controllers
                     return Redirect(returnUrl);
                 }
 
-                if (user.role1 == null)
-                {
-                    ViewBag.Error = "User role is not defined.";
-                    return View();
-                }
-
-                return user.role == 1 ? RedirectToAction("AdminDashboard", "Admin") : RedirectToAction("Dashboard", "Home");
+                return user.role == 1
+                    ? RedirectToAction("AdminDashboard", "Admin")
+                    : RedirectToAction("Dashboard", "Home");
             }
 
             ViewBag.Error = ErrorMessage;

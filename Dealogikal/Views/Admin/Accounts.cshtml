@@ -270,6 +270,27 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            Swal.fire({
+                title: 'Success',
+                text: successMessage,
+                icon: 'success',
+                timer: 1500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                width: '350px',
+                customClass: {
+                    popup: 'custom-swal-popup',
+                    icon: 'custom-swal-icon'
+                }
+            });
+        }
+    });
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
