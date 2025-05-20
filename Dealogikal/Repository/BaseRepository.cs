@@ -16,7 +16,7 @@ namespace Dealogikal.Repository
 
         public BaseRepository()
         {
-            _db = new DeologikalDTREntities();
+            _db = new DealogikalDTREntities();
             _table = _db.Set<T>();
         }
         public ErrorCode Create(T t, out string errorMsg)

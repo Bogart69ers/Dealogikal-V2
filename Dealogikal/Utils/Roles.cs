@@ -52,7 +52,7 @@ namespace Dealogikal.Utils
 
         public override string[] GetRolesForUser(string employeeId)
         {
-            DeologikalDTREntities db = new DeologikalDTREntities();
+            DealogikalDTREntities db = new DealogikalDTREntities();
             return db.vw_Role.Where(m => m.employeeId == employeeId).Select(m => m.roleName).ToArray();
         }
 

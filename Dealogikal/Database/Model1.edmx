@@ -4,7 +4,17 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="DeologikalDTRModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="DealogikalDTRModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="accLogs">
+          <Key>
+            <PropertyRef Name="logId" />
+          </Key>
+          <Property Name="logId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" />
+          <Property Name="ipaddress" Type="nvarchar" MaxLength="100" />
+          <Property Name="createdby" Type="nvarchar" MaxLength="100" />
+          <Property Name="date" Type="datetime" />
+        </EntityType>
         <EntityType Name="dtrRecords">
           <Key>
             <PropertyRef Name="recordId" />
@@ -73,6 +83,18 @@
           <Property Name="status" Type="int" />
           <Property Name="leaveRequestType" Type="nvarchar" MaxLength="100" />
         </EntityType>
+        <EntityType Name="loginLogs">
+          <Key>
+            <PropertyRef Name="logId" />
+          </Key>
+          <Property Name="logId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="employeeId" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="date" Type="datetime" />
+          <Property Name="latitude" Type="nvarchar(max)" />
+          <Property Name="longitude" Type="nvarchar(max)" />
+          <Property Name="ipaddress" Type="nvarchar(max)" />
+          <Property Name="addresslink" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="notification">
           <Key>
             <PropertyRef Name="id" />
@@ -126,7 +148,7 @@
           <Property Name="createdAt" Type="datetime" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_Role">
           <Key>
             <PropertyRef Name="userId" />
@@ -174,6 +196,18 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
               <PropertyRef Name="employeeId" />
             </Principal>
             <Dependent Role="leaveRequest">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_loginLogs_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="1" />
+          <End Role="loginLogs" Type="Self.loginLogs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="loginLogs">
               <PropertyRef Name="employeeId" />
             </Dependent>
           </ReferentialConstraint>
@@ -246,12 +280,14 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="DeologikalDTRModelStoreContainer">
+        <EntityContainer Name="DealogikalDTRModelStoreContainer">
+          <EntitySet Name="accLogs" EntityType="Self.accLogs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="dtrRecords" EntityType="Self.dtrRecords" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="employeeInfo" EntityType="Self.employeeInfo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="feedback" EntityType="Self.feedback" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="images" EntityType="Self.images" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="leaveRequest" EntityType="Self.leaveRequest" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="loginLogs" EntityType="Self.loginLogs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="notification" EntityType="Self.notification" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="overtimeRequest" EntityType="Self.overtimeRequest" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="role" EntityType="Self.role" Schema="dbo" store:Type="Tables" />
@@ -275,6 +311,10 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
           <AssociationSet Name="FK_leaveRequest_employeeInfo" Association="Self.FK_leaveRequest_employeeInfo">
             <End Role="employeeInfo" EntitySet="employeeInfo" />
             <End Role="leaveRequest" EntitySet="leaveRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_loginLogs_employeeInfo" Association="Self.FK_loginLogs_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="loginLogs" EntitySet="loginLogs" />
           </AssociationSet>
           <AssociationSet Name="FK_notification_employeeInfo" Association="Self.FK_notification_employeeInfo">
             <End Role="employeeInfo" EntitySet="employeeInfo" />
@@ -301,7 +341,17 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
     </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="DeologikalDTRModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="DealogikalDTRModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="accLogs">
+          <Key>
+            <PropertyRef Name="logId" />
+          </Key>
+          <Property Name="logId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ipaddress" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="createdby" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="date" Type="DateTime" Precision="3" />
+        </EntityType>
         <EntityType Name="dtrRecords">
           <Key>
             <PropertyRef Name="recordId" />
@@ -340,6 +390,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
           <NavigationProperty Name="dtrRecords" Relationship="Self.FK_dtrRecords_employeeInfo" FromRole="employeeInfo" ToRole="dtrRecords" />
           <NavigationProperty Name="images" Relationship="Self.FK_images_employeeInfo" FromRole="employeeInfo" ToRole="images" />
           <NavigationProperty Name="leaveRequest" Relationship="Self.FK_leaveRequest_employeeInfo" FromRole="employeeInfo" ToRole="leaveRequest" />
+          <NavigationProperty Name="loginLogs" Relationship="Self.FK_loginLogs_employeeInfo" FromRole="employeeInfo" ToRole="loginLogs" />
           <NavigationProperty Name="notification" Relationship="Self.FK_notification_employeeInfo" FromRole="employeeInfo" ToRole="notification" />
           <NavigationProperty Name="overtimeRequest" Relationship="Self.FK_overtimeRequest_employeeInfo" FromRole="employeeInfo" ToRole="overtimeRequest" />
           <NavigationProperty Name="todoLists" Relationship="Self.FK_todoLists_employeeInfo" FromRole="employeeInfo" ToRole="todoLists" />
@@ -379,6 +430,19 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
           <Property Name="status" Type="Int32" />
           <Property Name="leaveRequestType" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="employeeInfo" Relationship="Self.FK_leaveRequest_employeeInfo" FromRole="leaveRequest" ToRole="employeeInfo" />
+        </EntityType>
+        <EntityType Name="loginLogs">
+          <Key>
+            <PropertyRef Name="logId" />
+          </Key>
+          <Property Name="logId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="date" Type="DateTime" Precision="3" />
+          <Property Name="latitude" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="longitude" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ipaddress" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="addresslink" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_loginLogs_employeeInfo" FromRole="loginLogs" ToRole="employeeInfo" />
         </EntityType>
         <EntityType Name="notification">
           <Key>
@@ -489,6 +553,18 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_loginLogs_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="1" />
+          <End Role="loginLogs" Type="Self.loginLogs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="loginLogs">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_notification_employeeInfo">
           <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
@@ -557,12 +633,14 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="DeologikalDTREntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="DealogikalDTREntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="accLogs" EntityType="Self.accLogs" />
           <EntitySet Name="dtrRecords" EntityType="Self.dtrRecords" />
           <EntitySet Name="employeeInfo" EntityType="Self.employeeInfo" />
           <EntitySet Name="feedback" EntityType="Self.feedback" />
           <EntitySet Name="images" EntityType="Self.images" />
           <EntitySet Name="leaveRequest" EntityType="Self.leaveRequest" />
+          <EntitySet Name="loginLogs" EntityType="Self.loginLogs" />
           <EntitySet Name="notification" EntityType="Self.notification" />
           <EntitySet Name="overtimeRequest" EntityType="Self.overtimeRequest" />
           <EntitySet Name="role" EntityType="Self.role" />
@@ -580,6 +658,10 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
           <AssociationSet Name="FK_leaveRequest_employeeInfo" Association="Self.FK_leaveRequest_employeeInfo">
             <End Role="employeeInfo" EntitySet="employeeInfo" />
             <End Role="leaveRequest" EntitySet="leaveRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_loginLogs_employeeInfo" Association="Self.FK_loginLogs_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="loginLogs" EntitySet="loginLogs" />
           </AssociationSet>
           <AssociationSet Name="FK_notification_employeeInfo" Association="Self.FK_notification_employeeInfo">
             <End Role="employeeInfo" EntitySet="employeeInfo" />
@@ -607,9 +689,20 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="DeologikalDTRModelStoreContainer" CdmEntityContainer="DeologikalDTREntities">
+        <EntityContainerMapping StorageEntityContainer="DealogikalDTRModelStoreContainer" CdmEntityContainer="DealogikalDTREntities">
+          <EntitySetMapping Name="accLogs">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.accLogs">
+              <MappingFragment StoreEntitySet="accLogs">
+                <ScalarProperty Name="logId" ColumnName="logId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="ipaddress" ColumnName="ipaddress" />
+                <ScalarProperty Name="createdby" ColumnName="createdby" />
+                <ScalarProperty Name="date" ColumnName="date" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="dtrRecords">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.dtrRecords">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.dtrRecords">
               <MappingFragment StoreEntitySet="dtrRecords">
                 <ScalarProperty Name="recordId" ColumnName="recordId" />
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />
@@ -624,7 +717,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="employeeInfo">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.employeeInfo">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.employeeInfo">
               <MappingFragment StoreEntitySet="employeeInfo">
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />
                 <ScalarProperty Name="firstName" ColumnName="firstName" />
@@ -646,7 +739,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="feedback">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.feedback">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.feedback">
               <MappingFragment StoreEntitySet="feedback">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="name" ColumnName="name" />
@@ -658,7 +751,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="images">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.images">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.images">
               <MappingFragment StoreEntitySet="images">
                 <ScalarProperty Name="mediaId" ColumnName="mediaId" />
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />
@@ -667,7 +760,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="leaveRequest">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.leaveRequest">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.leaveRequest">
               <MappingFragment StoreEntitySet="leaveRequest">
                 <ScalarProperty Name="requestId" ColumnName="requestId" />
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />
@@ -681,8 +774,21 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="loginLogs">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.loginLogs">
+              <MappingFragment StoreEntitySet="loginLogs">
+                <ScalarProperty Name="logId" ColumnName="logId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="latitude" ColumnName="latitude" />
+                <ScalarProperty Name="longitude" ColumnName="longitude" />
+                <ScalarProperty Name="ipaddress" ColumnName="ipaddress" />
+                <ScalarProperty Name="addresslink" ColumnName="addresslink" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="notification">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.notification">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.notification">
               <MappingFragment StoreEntitySet="notification">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="title" ColumnName="title" />
@@ -695,7 +801,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="overtimeRequest">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.overtimeRequest">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.overtimeRequest">
               <MappingFragment StoreEntitySet="overtimeRequest">
                 <ScalarProperty Name="requestId" ColumnName="requestId" />
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />
@@ -709,7 +815,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="role">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.role">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.role">
               <MappingFragment StoreEntitySet="role">
                 <ScalarProperty Name="roleId" ColumnName="roleId" />
                 <ScalarProperty Name="roleName" ColumnName="roleName" />
@@ -717,7 +823,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="todoLists">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.todoLists">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.todoLists">
               <MappingFragment StoreEntitySet="todoLists">
                 <ScalarProperty Name="contentId" ColumnName="contentId" />
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />
@@ -728,7 +834,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="userAccount">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.userAccount">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.userAccount">
               <MappingFragment StoreEntitySet="userAccount">
                 <ScalarProperty Name="userId" ColumnName="userId" />
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />
@@ -739,7 +845,7 @@ warning 6002: The table/view 'DeologikalDTR.dbo.vw_Role' does not have a primary
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="vw_Role">
-            <EntityTypeMapping TypeName="DeologikalDTRModel.vw_Role">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.vw_Role">
               <MappingFragment StoreEntitySet="vw_Role">
                 <ScalarProperty Name="userId" ColumnName="userId" />
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />

@@ -20,6 +20,7 @@ namespace Dealogikal.Database
             this.dtrRecords = new HashSet<dtrRecords>();
             this.images = new HashSet<images>();
             this.leaveRequest = new HashSet<leaveRequest>();
+            this.loginLogs = new HashSet<loginLogs>();
             this.notification = new HashSet<notification>();
             this.overtimeRequest = new HashSet<overtimeRequest>();
             this.todoLists = new HashSet<todoLists>();
@@ -49,6 +50,8 @@ namespace Dealogikal.Database
         public virtual ICollection<images> images { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<leaveRequest> leaveRequest { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<loginLogs> loginLogs { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<notification> notification { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

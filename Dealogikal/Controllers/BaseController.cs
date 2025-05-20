@@ -19,7 +19,6 @@ namespace Dealogikal.Controllers
         public FeedbackManager _FeedbackManager;
         public NotificationManager _NotifManager;
         public MailManager _MailManager;
-
         public BaseController()
         {
             _userAcc = new BaseRepository<userAccount>();

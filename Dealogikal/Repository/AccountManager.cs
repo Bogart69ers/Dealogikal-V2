@@ -5,6 +5,7 @@ using System.Web;
 using Dealogikal.Utils;
 using Dealogikal.Database;
 using BCrypt.Net;
+using System.Net;
 
 namespace Dealogikal.Repository
 {
@@ -12,11 +13,13 @@ namespace Dealogikal.Repository
     {
         private BaseRepository<userAccount> _userAcc;
         private BaseRepository<employeeInfo> _employeeInf;
+        private BaseRepository<loginLogs> _loginLogs;
 
         public AccountManager()
         {
             _userAcc = new BaseRepository<userAccount>();
             _employeeInf = new BaseRepository<employeeInfo>();
+            _loginLogs = new BaseRepository<loginLogs>();
         }
 
         public userAccount GetUserByUserId(int userId)
@@ -63,6 +66,8 @@ namespace Dealogikal.Repository
         {
             return _employeeInf._table.FirstOrDefault(e => e.email == email);
         }
+
+
         public employeeInfo CreateOrRetrieve(String employeeId, ref String err)
         {
             var user = GetUserByEmployeeId(employeeId);
@@ -87,10 +92,23 @@ namespace Dealogikal.Repository
 
             return GetEmployeebyEmployeeId(user.employeeId);
         }
-
+        public ErrorCode CreateLoginLogs(loginLogs logs ,ref string errMsg)
+        {
+            try
+            {           
+                _loginLogs.Create(logs, out errMsg);
+                return ErrorCode.Success;
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
         public ErrorCode DeleteUser(int userId, ref string errMsg)
         {
             try
+
             {
                 var user = GetUserByUserId(userId);
                 if (user == null)

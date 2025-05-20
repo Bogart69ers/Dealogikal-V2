@@ -46,6 +46,11 @@
                 <div class="p-3">
                     <h3 class="mb-4">Log in</h3>
                     <form action="@Url.Action("Login", "Home")" method="post">
+
+                        <input type="hidden" id="latitude" name="latitude" />
+                        <input type="hidden" id="longitude" name="longitude" />
+                        <!-- You can add address if you're resolving it via JS -->
+
                         <div class="mb-3">
                             <label for="employeeId" class="form-label">ID Number/ Email <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="Employee ID/ Email" required>
@@ -126,3 +131,12 @@
         });
     });
 </script>
+
+<script>
+    navigator.geolocation.getCurrentPosition(function (position) {
+        document.getElementById("latitude").value = position.coords.latitude;
+        document.getElementById("longitude").value = position.coords.longitude;
+        // Optional: Fetch address using reverse geocoding API if needed
+    });
+</script>
+

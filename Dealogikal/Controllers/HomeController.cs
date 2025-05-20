@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -8,7 +9,10 @@ using Dealogikal.Database;
 using Dealogikal.Repository;
 using Dealogikal.Utils;
 using Dealogikal.ViewModel;
-
+using DocumentFormat.OpenXml.Bibliography;
+using Newtonsoft.Json;
+using System.Net.Http;
+using DocumentFormat.OpenXml.InkML;
 
 namespace Dealogikal.Controllers
 {
@@ -53,9 +57,24 @@ namespace Dealogikal.Controllers
             return View();
         }
 
+        private string GetClientIp()
+        {
+            string ip = Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+            if (!string.IsNullOrEmpty(ip))
+            {
+                string[] addresses = ip.Split(',');
+                if (addresses.Length != 0)
+                {
+                    return addresses[0];
+                }
+            }
+
+            return Request.ServerVariables["REMOTE_ADDR"];
+        }
+
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult Login(string employeeId, string password, string returnUrl, bool rememberMe = false)
+        public ActionResult Login(string employeeId, string password, string returnUrl, bool rememberMe = false, string latitude = null , string longitude = null)
         {
             if (_AccManager == null)
             {
@@ -68,13 +87,16 @@ namespace Dealogikal.Controllers
 
             if (_AccManager.SignIn(employeeId, password, ref ErrorMessage) == ErrorCode.Success)
             {
+
                 // Always get employee info by email or ID (loginInput can be either)
                 var info = _AccManager.GetEmployeebyEmployeeIdOrEmail(employeeId);
+
                 if (info == null)
                 {
                     ViewBag.Error = "Employee information not found";
                     return View();
                 }
+
 
                 if (info.status == 0)
                 {
@@ -92,6 +114,26 @@ namespace Dealogikal.Controllers
                 if (user.role1 == null)
                 {
                     ViewBag.Error = "User role is not defined.";
+                    return View();
+                }
+
+                string ipAddress = GetClientIp();
+
+                string address = $"https://www.google.com/maps?q={latitude} , {longitude}";
+
+                var loginLog = new loginLogs
+                {
+                    employeeId = info.employeeId,
+                    ipaddress = ipAddress,
+                    latitude = latitude,
+                    longitude = longitude,
+                    addresslink = address,
+                    date = DateTime.Now
+                };
+
+                if (_AccManager.CreateLoginLogs(loginLog, ref ErrorMessage) != ErrorCode.Success)
+                {
+                    ViewBag.Error = "Error creating login log: " + ErrorMessage;
                     return View();
                 }
 
@@ -518,7 +560,7 @@ namespace Dealogikal.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult LeaveApproval(leaveRequest lr, string employeeId, int requestId, string action)
+        public ActionResult LeaveApproval(string employeeId, int requestId, string action)
         {
             string errMsg = string.Empty;
             ErrorCode result;
@@ -667,7 +709,7 @@ namespace Dealogikal.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult OvertimeApproval(overtimeRequest or, string employeeId, int requestId, string action)
+        public ActionResult OvertimeApproval(string employeeId, int requestId, string action)
         {
             string errMsg = string.Empty;
             ErrorCode result;

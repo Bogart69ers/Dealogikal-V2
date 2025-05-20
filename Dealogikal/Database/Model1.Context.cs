@@ -13,10 +13,10 @@ namespace Dealogikal.Database
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class DeologikalDTREntities : DbContext
+    public partial class DealogikalDTREntities : DbContext
     {
-        public DeologikalDTREntities()
-            : base("name=DeologikalDTREntities")
+        public DealogikalDTREntities()
+            : base("name=DealogikalDTREntities")
         {
         }
     
@@ -25,11 +25,13 @@ namespace Dealogikal.Database
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<accLogs> accLogs { get; set; }
         public virtual DbSet<dtrRecords> dtrRecords { get; set; }
         public virtual DbSet<employeeInfo> employeeInfo { get; set; }
         public virtual DbSet<feedback> feedback { get; set; }
         public virtual DbSet<images> images { get; set; }
         public virtual DbSet<leaveRequest> leaveRequest { get; set; }
+        public virtual DbSet<loginLogs> loginLogs { get; set; }
         public virtual DbSet<notification> notification { get; set; }
         public virtual DbSet<overtimeRequest> overtimeRequest { get; set; }
         public virtual DbSet<role> role { get; set; }
