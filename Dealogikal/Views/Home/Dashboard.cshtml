@@ -233,3 +233,11 @@ else
         setInterval(updateClock, 1000);
 </script>
 
+<script>
+    document.getElementById("btn2").addEventListener("click", function (e) {
+        const confirmed = confirm("Are you sure you want to time out?");
+        if (!confirmed) {
+            e.preventDefault(); // Stop the form from submitting
+        }
+    });
+</script>
