@@ -208,13 +208,13 @@ namespace Dealogikal.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult Dtr(dtrRecords dtr, int? recordId, string dtrAction)
+        public ActionResult Dtr(dtrRecords dtr, int? recordId, string action)
         {
             var currentUser = User.Identity.Name;
             string errMsg = string.Empty;
             ErrorCode result;
 
-            if (dtrAction == "TimeIn")
+            if (action == "TimeIn")
             {
                 result = _DtrManager.CreateDtr(dtr, currentUser, ref errMsg);
                 if (result != ErrorCode.Success)
@@ -223,7 +223,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("AdminDashboard");
                 }
             }
-            else if (dtrAction == "BreakIn")
+            else if (action == "BreakIn")
             {
                 if (recordId.HasValue)
                 {
@@ -240,7 +240,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("AdminDashboard");
                 }
             }
-            else if (dtrAction == "BreakOut")
+            else if (action == "BreakOut")
             {
                 result = _DtrManager.UpdateBreakOut(currentUser, recordId.Value, dtr.workMode, ref errMsg);
                 if (result != ErrorCode.Success)
@@ -249,7 +249,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("AdminDashboard");
                 }
             }
-            else if (dtrAction == "TimeOut")
+            else if (action == "TimeOut")
             {
                 if (recordId.HasValue)
                 {
@@ -851,7 +851,7 @@ namespace Dealogikal.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult EditEmployee(string employeeId, string firstName, string lastName, string phone, string email, string address, string barangay, string city, DateTime? birthdate, DateTime? dateHired, string department, string position, string corporation, HttpPostedFileBase profilePicture)
+        public ActionResult EditEmployee(string employeeId, string firstName, string lastName, string phone, string email, string address, string barangay, string city, DateTime? birthdate, DateTime? dateHired, string department, string position, string corporation, HttpPostedFileBase profilePicture, int leaveCount)
         {
             if (string.IsNullOrEmpty(employeeId))
             {
@@ -914,6 +914,7 @@ namespace Dealogikal.Controllers
                 employee.corporation = !string.IsNullOrEmpty(corporation) ? corporation : employee.corporation;
                 employee.department = !string.IsNullOrEmpty(department) ? department : employee.department;
                 employee.position = !string.IsNullOrEmpty(position) ? position : employee.position;
+                employee.leaveCount = !string.IsNullOrEmpty(leaveCount.ToString()) ? leaveCount : employee.leaveCount;
                 if (birthdate.HasValue)
                 {
                     employee.birthdate = birthdate.Value;

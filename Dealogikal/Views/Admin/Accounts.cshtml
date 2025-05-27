@@ -136,6 +136,10 @@
                                                                             <strong>Address:</strong>
                                                                             @(string.IsNullOrEmpty(employee.address) ? "No Information" : $"{employee.address}, {employee.barangay}, {employee.city}")
                                                                         </p>
+                                                                        <p>
+                                                                            <strong>Leave Count:</strong>
+                                                                            @(employee.leaveCount.HasValue ? employee.leaveCount.Value.ToString() : "0")
+                                                                        </p>
                                                                     </div>
 
                                                                     <div class="d-flex gap-2 mt-3">
@@ -235,6 +239,10 @@
                                     <div class="form-group">
                                         <label for="editBarangay">Barangay</label>
                                         <input type="text" class="form-control" id="editBarangay" name="barangay">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editLeaveCount">Leave Count</label>
+                                        <input type="text" class="form-control" id="editLeaveCount" name="leaveCount" required>
                                     </div>
                                 </div>
 
@@ -451,6 +459,7 @@ const employeeImages = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Mod
         document.getElementById('editEmail').value = employee.email || '';
         document.getElementById('editCity').value = employee.city || '';
         document.getElementById('editCorporation').value = employee.corporation || '';
+        document.getElementById('editLeaveCount').value = employee.leaveCount || '';
 
         // Handle profile image preview
         const imgPath = employeeImage && employeeImage.imageFile

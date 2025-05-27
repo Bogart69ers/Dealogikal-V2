@@ -6,6 +6,10 @@
     var name = ViewBag.Name;
 }
 
+@{
+    // Get server time in SGT
+    var serverTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Singapore Standard Time");
+}
 <link href="~/Assets/css/Dashboard.css" rel="stylesheet" />
 
 @if (Model.dtr != null)
@@ -130,8 +134,12 @@ else
 
 <script>
     function updateButtons() {
-        var now = new Date();
-        var currentHour = now.getHours();
+
+        const now = getSyncedNow();
+
+        // Convert UTC to Singapore Time (UTC+8)
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
 
         var timeInVal = $('#timeIn').val();
         var breakInVal = $('#breakIn').val();
@@ -141,37 +149,38 @@ else
         var btn1 = $('#btn1');
         var btn2 = $('#btn2');
 
-        if (currentHour < 12) {
-            // Morning Shift: Time In & Break In
+        if (currentHour === 12 && currentMinute >= 16 && currentMinute <= 44) {
+            // ⛔ Disabled Period: 12:16 - 12:44 PM
+            btn1.prop("disabled", true);
+            btn2.prop("disabled", true);
+        }
+        else if (currentHour < 12 || (currentHour === 12 && currentMinute <= 15)) {
+            // 🌅 Morning Shift
             if (!timeInVal) {
-                console.log("Enable Time In Button");
                 btn1.text("Time In").val("TimeIn").prop("disabled", false);
                 btn2.text("Time Out").val("BreakIn").prop("disabled", true);
             } else if (timeInVal && !breakInVal) {
-                console.log("Enable Break In Button");
                 btn1.prop("disabled", true);
                 btn2.text("Time Out").val("BreakIn").prop("disabled", false);
             } else {
-                console.log("Disable Morning Buttons");
-                btn1.prop("disabled", true);
-                btn2.prop("disabled", true);
-            }
-        } else {
-            // Afternoon Shift: Break Out & Time Out
-            if (!breakOutVal) {
-                console.log("Enable Break Out Button");
-                btn1.text("Time In").val("BreakOut").prop("disabled", false);
-                btn2.text("Time Out").val("TimeOut").prop("disabled", true);
-            } else if (breakOutVal && !timeOutVal) {
-                console.log("Enable Time Out Button");
-                btn1.prop("disabled", true);
-                btn2.text("Time Out").val("TimeOut").prop("disabled", false);
-            } else {
-                console.log("Disable Afternoon Buttons");
                 btn1.prop("disabled", true);
                 btn2.prop("disabled", true);
             }
         }
+        else if (currentHour > 12 || (currentHour === 12 && currentMinute >= 45)) {
+            // 🌇 Afternoon Shift
+            if (!breakOutVal) {
+                btn1.text("Time In").val("BreakOut").prop("disabled", false);
+                btn2.text("Time Out").val("TimeOut").prop("disabled", true);
+            } else if (breakOutVal && !timeOutVal) {
+                btn1.prop("disabled", true);
+                btn2.text("Time Out").val("TimeOut").prop("disabled", false);
+            } else {
+                btn1.prop("disabled", true);
+                btn2.prop("disabled", true);
+            }
+        }
+
     }
 
     // Run button update on page load
@@ -183,7 +192,8 @@ else
 
 <script>
     function updateClock() {
-        const now = new Date();
+        const now = getSyncedNow();
+
         let hours = now.getHours();
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
@@ -229,8 +239,8 @@ else
         drawHand(90, 2, seconds * 6, "red");
 
         ctx.restore();
-        }
-        setInterval(updateClock, 1000);
+    }
+    setInterval(updateClock, 1000);
 </script>
 
 <script>
@@ -240,4 +250,13 @@ else
             e.preventDefault(); // Stop the form from submitting
         }
     });
+</script>
+<script>
+    // Injected server time as base reference
+    const serverTime = new Date("@serverTime.ToString("yyyy-MM-ddTHH:mm:ss")");
+    const clientLoadTime = Date.now(); // Reference point to simulate ticking
+
+    function getSyncedNow() {
+        return new Date(serverTime.getTime() + (Date.now() - clientLoadTime));
+    }
 </script>

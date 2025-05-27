@@ -1325,6 +1325,11 @@ namespace Dealogikal.Controllers
             }
         }
 
+        [Authorize]
+        public ActionResult OfficialBusiness()
+        {
+            return View();
+        }
 
     }
 }
