@@ -1377,6 +1377,7 @@
     <Compile Include="Utils\Roles.cs" />
     <Compile Include="Utils\Utilities.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />
+    <Compile Include="ViewModel\ToggleAccountStatusModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />

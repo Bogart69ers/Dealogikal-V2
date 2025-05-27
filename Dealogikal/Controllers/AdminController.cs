@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using ClosedXML.Excel;
 using Dealogikal.Database;
 using Dealogikal.Utils;
@@ -955,6 +956,45 @@ namespace Dealogikal.Controllers
 
             return Json(new { success = true, message = "All notifications marked as read!" });
         }
+
+        [HttpPost]
+        [Authorize]
+        public JsonResult ToggleAccountStatus()
+        {
+            try
+            {
+                Request.InputStream.Position = 0;
+                using (var reader = new StreamReader(Request.InputStream))
+                {
+                    var bodyText = reader.ReadToEnd();
+                    var model = new JavaScriptSerializer().Deserialize<ToggleAccountStatusModel>(bodyText);
+
+                    if (string.IsNullOrEmpty(model.EmployeeId))
+                    {
+                        return Json(new { success = false, message = "Employee ID is required." });
+                    }
+
+                    string errorMsg = string.Empty;
+                    var userAccount = _AccManager.GetUserByEmployeeId(model.EmployeeId);
+                    if (userAccount == null)
+                    {
+                        return Json(new { success = false, message = "User not found." });
+                    }
+
+                    if (_AccManager.UpdateAccountStatus(model.EmployeeId, model.Status, ref errorMsg) != ErrorCode.Success)
+                    {
+                        return Json(new { success = false, message = errorMsg });
+                    }
+
+                    return Json(new { success = true, message = "Account status changed successfully." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
 
         [HttpPost]
         [Authorize]

@@ -105,6 +105,31 @@ namespace Dealogikal.Repository
                 return ErrorCode.Error;
             }
         }
+
+        public ErrorCode UpdateAccountStatus(string employeeId, int newStatus, ref string errMsg)
+        {
+            try
+            {
+                var user = GetEmployeebyEmployeeId(employeeId);
+                if (user == null)
+                {
+                    errMsg = "Employee not found";
+                    return ErrorCode.Error;
+                }
+
+                // Update status directly on the existing user object
+                user.status = newStatus;
+
+                return _employeeInf.Update(user.employeeId, user, out errMsg);
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+
         public ErrorCode DeleteUser(int userId, ref string errMsg)
         {
             try
@@ -304,5 +329,29 @@ namespace Dealogikal.Repository
             }
 
         }
+        public ErrorCode ResetAnnualLeaveCount(ref string errMsg)
+        {
+            try
+            {
+                var allEmployees = _employeeInf.GetAll();
+
+                foreach (var emp in allEmployees)
+                {
+                    emp.leaveCount = 7;
+                    if (_employeeInf.Update(emp.employeeId, emp, out errMsg) != ErrorCode.Success)
+                    {
+                        return ErrorCode.Error;
+                    }
+                }
+
+                return ErrorCode.Success;
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
     }
 }

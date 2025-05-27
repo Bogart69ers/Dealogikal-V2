@@ -138,8 +138,18 @@
                                                                         </p>
                                                                     </div>
 
-                                                                    <!-- Edit Info Button -->
-                                                                    <button class="btn btn-primary btn-sm edit-button" onclick="editInfo('@employee.employeeId')">✏ Edit Info</button>
+                                                                    <div class="d-flex gap-2 mt-3">
+                                                                        <button class="mr-3 btn btn-primary btn-sm" onclick="editInfo('@employee.employeeId')">✏ Edit Info</button>
+                                                                        @if (employee.status == 1)
+                                                                        {
+                                                                            <button class="btn btn-danger btn-sm" onclick="toggleAccountStatus('@employee.employeeId', 0)">🛑 Disable Account</button>
+                                                                        }
+                                                                        else if (employee.status == 0)
+                                                                        {
+                                                                            <button class="btn btn-success btn-sm" onclick="toggleAccountStatus('@employee.employeeId', 1)">✅ Activate Account</button>
+                                                                        }
+                                                                    </div>
+
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -293,108 +303,108 @@
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    let currentPage = 1;
-    let rowsPerPage = 5;
-    let table = document.getElementById("employeeTable");
-    let tbody = table.getElementsByTagName("tbody")[0];
-    let allRows = Array.from(tbody.getElementsByTagName("tr")).filter(row => !row.classList.contains("details-row"));
-    let rows = [...allRows]; // Copy for filtering
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentPage = 1;
+        let rowsPerPage = 5;
+        let table = document.getElementById("employeeTable");
+        let tbody = table.getElementsByTagName("tbody")[0];
+        let allRows = Array.from(tbody.getElementsByTagName("tr")).filter(row => !row.classList.contains("details-row"));
+        let rows = [...allRows]; // Copy for filtering
 
-    function displayPage(page) {
-        let start = (page - 1) * rowsPerPage;
-        let end = start + rowsPerPage;
+        function displayPage(page) {
+            let start = (page - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
 
-        // Hide all rows first
-        allRows.forEach(row => row.style.display = "none");
-        rows.slice(start, end).forEach(row => row.style.display = "");
+            // Hide all rows first
+            allRows.forEach(row => row.style.display = "none");
+            rows.slice(start, end).forEach(row => row.style.display = "");
 
-        // Hide all details when switching pages
-        document.querySelectorAll(".details-row").forEach(row => row.style.display = "none");
+            // Hide all details when switching pages
+            document.querySelectorAll(".details-row").forEach(row => row.style.display = "none");
 
-        updatePagination();
-    }
-
-    function updatePagination() {
-        document.getElementById("prevPage").disabled = currentPage === 1;
-        document.getElementById("nextPage").disabled = currentPage * rowsPerPage >= rows.length;
-    }
-
-    document.getElementById("prevPage").addEventListener("click", function () {
-        if (currentPage > 1) {
-            currentPage--;
-            displayPage(currentPage);
-        }
-    });
-
-    document.getElementById("nextPage").addEventListener("click", function () {
-        if (currentPage * rowsPerPage < rows.length) {
-            currentPage++;
-            displayPage(currentPage);
-        }
-    });
-
-    displayPage(currentPage);
-
-    // 🔍 Optimized Search Functionality with Reset
-    document.getElementById("searchInput").addEventListener("keyup", function () {
-        let filter = this.value.toLowerCase().trim();
-
-        if (filter === "") {
-            // If search is cleared, reset to original list
-            rows = [...allRows];
-        } else {
-            // Filter rows based on search input
-            rows = allRows.filter(row => row.innerText.toLowerCase().includes(filter));
+            updatePagination();
         }
 
-        currentPage = 1; // Reset to first page
-        displayPage(currentPage);
-    });
+        function updatePagination() {
+            document.getElementById("prevPage").disabled = currentPage === 1;
+            document.getElementById("nextPage").disabled = currentPage * rowsPerPage >= rows.length;
+        }
 
-    // 🔽 Sorting Functionality
-    window.sortTable = function (columnIndex) {
-        let switching = true;
-        let direction = "asc";
-
-        while (switching) {
-            switching = false;
-            for (let i = 0; i < rows.length - 1; i++) {
-                let shouldSwitch = false;
-                let row1 = rows[i].getElementsByTagName("td")[columnIndex].innerText.toLowerCase();
-                let row2 = rows[i + 1].getElementsByTagName("td")[columnIndex].innerText.toLowerCase();
-
-                if ((direction === "asc" && row1 > row2) || (direction === "desc" && row1 < row2)) {
-                    tbody.insertBefore(rows[i + 1], rows[i]);
-                    switching = true;
-                    shouldSwitch = true;
-                    break;
-                }
+        document.getElementById("prevPage").addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                displayPage(currentPage);
             }
-            if (!shouldSwitch) {
-                direction = (direction === "asc") ? "desc" : "asc";
-            }
-        }
-
-        // Reset pagination after sorting
-        rows = [...allRows];
-        currentPage = 1;
-        displayPage(currentPage);
-    };
-
-    // 🔽 Toggle Details Row (Only Show One at a Time)
-    window.toggleDetails = function (id) {
-        let row = document.getElementById(id);
-
-        // Hide all other details rows
-        document.querySelectorAll(".details-row").forEach(r => {
-            if (r !== row) r.style.display = "none";
         });
 
-        // Toggle the clicked row
-        row.style.display = (row.style.display === "none" || row.style.display === "") ? "table-row" : "none";
-    };
-});
+        document.getElementById("nextPage").addEventListener("click", function () {
+            if (currentPage * rowsPerPage < rows.length) {
+                currentPage++;
+                displayPage(currentPage);
+            }
+        });
+
+        displayPage(currentPage);
+
+        // 🔍 Optimized Search Functionality with Reset
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+            let filter = this.value.toLowerCase().trim();
+
+            if (filter === "") {
+                // If search is cleared, reset to original list
+                rows = [...allRows];
+            } else {
+                // Filter rows based on search input
+                rows = allRows.filter(row => row.innerText.toLowerCase().includes(filter));
+            }
+
+            currentPage = 1; // Reset to first page
+            displayPage(currentPage);
+        });
+
+        // 🔽 Sorting Functionality
+        window.sortTable = function (columnIndex) {
+            let switching = true;
+            let direction = "asc";
+
+            while (switching) {
+                switching = false;
+                for (let i = 0; i < rows.length - 1; i++) {
+                    let shouldSwitch = false;
+                    let row1 = rows[i].getElementsByTagName("td")[columnIndex].innerText.toLowerCase();
+                    let row2 = rows[i + 1].getElementsByTagName("td")[columnIndex].innerText.toLowerCase();
+
+                    if ((direction === "asc" && row1 > row2) || (direction === "desc" && row1 < row2)) {
+                        tbody.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+                if (!shouldSwitch) {
+                    direction = (direction === "asc") ? "desc" : "asc";
+                }
+            }
+
+            // Reset pagination after sorting
+            rows = [...allRows];
+            currentPage = 1;
+            displayPage(currentPage);
+        };
+
+        // 🔽 Toggle Details Row (Only Show One at a Time)
+        window.toggleDetails = function (id) {
+            let row = document.getElementById(id);
+
+            // Hide all other details rows
+            document.querySelectorAll(".details-row").forEach(r => {
+                if (r !== row) r.style.display = "none";
+            });
+
+            // Toggle the clicked row
+            row.style.display = (row.style.display === "none" || row.style.display === "") ? "table-row" : "none";
+        };
+    });
 </script>
 
 <script>
@@ -465,5 +475,59 @@ const employeeImages = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Mod
             reader.readAsDataURL(file);
         }
     });
+</script>
+
+<script>
+    function toggleAccountStatus(employeeId, newStatus) {
+        const action = newStatus === 1 ? "activate" : "disable";
+        const actionLabel = newStatus === 1 ? "Activate" : "Disable";
+
+        Swal.fire({
+            title: `Are you sure?`,
+            text: `This will ${action} the employee's account.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: newStatus === 1 ? '#3085d6' : '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: `Yes, ${actionLabel} it!`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/Admin/ToggleAccountStatus`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify({ employeeId, status: newStatus })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: `Account has been ${action}d.`,
+                                icon: 'success',
+                                timer: 1200,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                width: '350px',
+                                customClass: {
+                                    popup: 'custom-swal-popup',
+                                    icon: 'custom-swal-icon'
+                                }
+                            }).then(() => {
+                                location.reload(); // Refresh page after confirmation
+                            });
+                        } else {
+                            Swal.fire('Error', 'Failed to update account status.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'An unexpected error occurred.', 'error');
+                    });
+            }
+        });
+    }
 </script>
 
