@@ -13,6 +13,7 @@ using DocumentFormat.OpenXml.Bibliography;
 using Newtonsoft.Json;
 using System.Net.Http;
 using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Office2016.Excel;
 
 namespace Dealogikal.Controllers
 {
@@ -26,7 +27,7 @@ namespace Dealogikal.Controllers
 
             if (user == null)
             {
-                return RedirectToAction("Login", "Home"); 
+                return RedirectToAction("Login", "Home");
             }
 
             switch (user.role1.roleName)
@@ -38,7 +39,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("Dashboard", "Home");
 
                 default:
-                    return RedirectToAction("Login", "Home"); 
+                    return RedirectToAction("Login", "Home");
             }
         }
 
@@ -74,7 +75,7 @@ namespace Dealogikal.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult Login(string employeeId, string password, string returnUrl, bool rememberMe = false, string latitude = null , string longitude = null)
+        public ActionResult Login(string employeeId, string password, string returnUrl, bool rememberMe = false, string latitude = null, string longitude = null)
         {
             if (_AccManager == null)
             {
@@ -288,9 +289,9 @@ namespace Dealogikal.Controllers
 
             int availableLPDays = leaveCount - pendingLPDays;
 
-            ViewBag.LeaveCount = leaveCount;     
-            ViewBag.AvailableLPDays = availableLPDays; 
-            ViewBag.PendingLPDays = pendingLPDays;     
+            ViewBag.LeaveCount = leaveCount;
+            ViewBag.AvailableLPDays = availableLPDays;
+            ViewBag.PendingLPDays = pendingLPDays;
 
             var requests = _RequestManager.GetLeaveRequestByEmployeeId(currentUserId);
 
@@ -386,7 +387,20 @@ namespace Dealogikal.Controllers
                 var notifManager = new NotificationManager();
                 var deptHead = _AccManager.GetDepartmentHeadByDepartment(userInfo.department);
 
-                if (deptHead != null)
+                if (userInfo.position == "Department Head")
+                {
+                    _MailManager.DHLeaveEmail(
+                    userInfo.firstName,
+                    userInfo.lastName,
+                    lr.leaveType,
+                    lr.leaveStart.Value,
+                    lr.leaveEnd.Value,
+                    lr.status.Value,
+                    ref errMsg,
+                    userInfo.corporation
+                );
+                }
+                else if (deptHead != null)
                 {
                     notifManager.CreateNotification(
                         deptHead.employeeId,
@@ -465,8 +479,8 @@ namespace Dealogikal.Controllers
                 if (deptHead != null)
                 {
                     notifManager.CreateNotification(
-                        deptHead.employeeId,                  
-                        userInfo.employeeId,                   
+                        deptHead.employeeId,
+                        userInfo.employeeId,
                         "Pending Overtime Request",
                         $"{userInfo.firstName} {userInfo.lastName} has submitted an overtime request.",
                         ref errMsg
@@ -620,8 +634,8 @@ namespace Dealogikal.Controllers
                         return RedirectToAction("LeaveApproval");
                     }
                 }
-
-                result = _RequestManager.ApproveLeaveRequest(employeeId, requestId, ref errMsg);
+                
+                result = _RequestManager.ApproveLeaveRequest(requestId, ref errMsg);
 
                 if (result != ErrorCode.Success)
                 {
@@ -661,7 +675,7 @@ namespace Dealogikal.Controllers
                     return RedirectToAction("LeaveApproval");
                 }
 
-                result = _RequestManager.DeclineLeaveRequest(employeeId, requestId, ref errMsg);
+                result = _RequestManager.DeclineLeaveRequest(requestId, ref errMsg);
                 if (result != ErrorCode.Success)
                 {
                     ViewBag.Error = "Error declining leave request: " + errMsg;
@@ -718,7 +732,7 @@ namespace Dealogikal.Controllers
 
             if (action == "Accept")
             {
-                result = _RequestManager.ApproveOvertimeRequest(employeeId, requestId, ref errMsg);
+                result = _RequestManager.ApproveOvertimeRequest(requestId, ref errMsg);
                 if (result != ErrorCode.Success)
                 {
                     ViewBag.Error = "Error Updating Overtime Request: " + errMsg;
@@ -726,8 +740,8 @@ namespace Dealogikal.Controllers
                 }
 
                 _NotifManager.CreateNotification(
-                    employeeId,                            
-                    User.Identity.Name,                   
+                    employeeId,
+                    User.Identity.Name,
                     "Overtime Request Approved",
                     "Your overtime request has been approved by the Department Head.",
                     ref errMsg
@@ -736,7 +750,7 @@ namespace Dealogikal.Controllers
             }
             else if (action == "Decline")
             {
-                result = _RequestManager.DeclineOvertimeRequest(employeeId, requestId, ref errMsg);
+                result = _RequestManager.DeclineOvertimeRequest(requestId, ref errMsg);
                 if (result != ErrorCode.Success)
                 {
                     ViewBag.Error = "Error Updating Overtime Request: " + errMsg;
@@ -744,8 +758,8 @@ namespace Dealogikal.Controllers
                 }
 
                 _NotifManager.CreateNotification(
-                    employeeId,                           
-                    User.Identity.Name,                  
+                    employeeId,
+                    User.Identity.Name,
                     "Overtime Request Declined",
                     "Your overtime request has been declined by the Department Head.",
                     ref errMsg
@@ -807,7 +821,7 @@ namespace Dealogikal.Controllers
                         var oldImagePath = Path.Combine(uploadsFolderPath, image.imageFile);
                         if (System.IO.File.Exists(oldImagePath))
                         {
-                            System.IO.File.Delete(oldImagePath); 
+                            System.IO.File.Delete(oldImagePath);
                         }
                     }
                     profilePicture.SaveAs(profileSavePath);
@@ -952,7 +966,7 @@ namespace Dealogikal.Controllers
         [Authorize]
         public ActionResult ChangePassword(string OldPassword, string NewPassword, string ConfirmNewPassword)
         {
-            var employeeId = User.Identity.Name; 
+            var employeeId = User.Identity.Name;
             string errorMsg = string.Empty;
 
             if (string.IsNullOrWhiteSpace(OldPassword) || string.IsNullOrWhiteSpace(NewPassword) || string.IsNullOrWhiteSpace(ConfirmNewPassword))
@@ -977,11 +991,11 @@ namespace Dealogikal.Controllers
 
             bool isOldPasswordCorrect = false;
 
-            if (userAccount.password.StartsWith("$2")) 
+            if (userAccount.password.StartsWith("$2"))
             {
                 isOldPasswordCorrect = BCrypt.Net.BCrypt.Verify(OldPassword, userAccount.password);
             }
-            else 
+            else
             {
                 isOldPasswordCorrect = userAccount.password == OldPassword;
             }
@@ -1014,7 +1028,7 @@ namespace Dealogikal.Controllers
 
         }
 
-        [AllowAnonymous]     
+        [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
             return View();
@@ -1042,11 +1056,11 @@ namespace Dealogikal.Controllers
                 Session["VerificationCode"] = verificationCode;
                 Session["VerificationUserId"] = user.employeeId;
                 Session["VerificationEmail"] = email;
-                Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5); 
+                Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5);
 
 
                 string errorMessage = "";
-                var mailManager = new MailManager(); 
+                var mailManager = new MailManager();
                 string subject = "Your Password Reset Verification Code";
                 string body = $@"
                             <!DOCTYPE html>
@@ -1137,7 +1151,7 @@ namespace Dealogikal.Controllers
             string verificationCode = random.Next(100000, 999999).ToString();
 
             Session["VerificationCode"] = verificationCode;
-            Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5); 
+            Session["VerificationCodeExpiresAt"] = DateTime.Now.AddMinutes(5);
 
             string errorMessage = "";
             var mailManager = new MailManager();
@@ -1217,7 +1231,7 @@ namespace Dealogikal.Controllers
                 return RedirectToAction("ForgotPassword");
             }
 
-            ViewBag.ExpiresAt = expiresAt.Value.ToString("o"); 
+            ViewBag.ExpiresAt = expiresAt.Value.ToString("o");
             return View();
         }
 
@@ -1239,7 +1253,7 @@ namespace Dealogikal.Controllers
             if (DateTime.Now > expiresAt.Value)
             {
                 TempData["Error"] = "Your verification code has expired. Please request a new one.";
-                
+
                 Session.Remove("VerificationCode");
                 Session.Remove("VerificationUserId");
                 Session.Remove("VerificationCodeExpiresAt");
@@ -1252,7 +1266,7 @@ namespace Dealogikal.Controllers
                 return RedirectToAction("VerifyCode");
             }
 
-            Session.Remove("VerificationCode"); 
+            Session.Remove("VerificationCode");
             Session.Remove("VerificationCodeExpiresAt");
 
             return RedirectToAction("ConfirmationPassword", new { id = employeeId });
@@ -1325,11 +1339,117 @@ namespace Dealogikal.Controllers
             }
         }
 
+
         [Authorize]
-        public ActionResult OfficialBusiness()
+        public ActionResult OfficialBusinessApproval()
         {
-            return View();
+            var currentUserId = User.Identity.Name;
+
+            var deptHead = _AccManager.GetEmployeebyEmployeeId(currentUserId);
+
+            var employeesInDepartment = _AccManager.GetAllEmployee()
+                .Where(e => e.department == deptHead.department)
+                .ToList();
+
+            var OBRequestsInDepartment = _RequestManager.GetAllObRequestsDesc()
+                .Where(lr => employeesInDepartment.Any(emp => emp.employeeId == lr.employeeId) && lr.employeeId != currentUserId)
+                .ToList();
+
+            var model = new AccountViewModel
+            {
+                employeeInfos = employeesInDepartment,
+                obreq = OBRequestsInDepartment
+            };
+
+            return View(model);
         }
 
+        [HttpPost]
+        [Authorize]
+        public ActionResult OfficialBusinessApproval(string employeeId, int obId, string action)
+        {
+            string errMsg = string.Empty;
+            ErrorCode result;
+            if (action == "Accept")
+            {
+                result = _RequestManager.ApproveObRequest(obId, ref errMsg);
+                if (result != ErrorCode.Success)
+                {
+                    ViewBag.Error = "Error Updating Official Business Request: " + errMsg;
+                    return RedirectToAction("OfficialBusinessApproval");
+                }
+                _NotifManager.CreateNotification(
+                    employeeId,
+                    User.Identity.Name,
+                    "Official Business Request Approved",
+                    "Your official business request has been approved by the Department Head.",
+                    ref errMsg
+                );
+            }
+            else if (action == "Decline")
+            {
+                result = _RequestManager.DeclineObRequest(obId, ref errMsg);
+                if (result != ErrorCode.Success)
+                {
+                    ViewBag.Error = "Error Updating Official Business Request: " + errMsg;
+                    return RedirectToAction("OfficialBusinessApproval");
+                }
+                _NotifManager.CreateNotification(
+                    employeeId,
+                    User.Identity.Name,
+                    "Official Business Request Declined",
+                    "Your official business request has been declined by the Department Head.",
+                    ref errMsg
+                );
+            }
+            TempData["SuccessMessage"] = "Official business request updated successfully!";
+            return RedirectToAction("OfficialBusinessApproval");
+
+        }
+
+        [Authorize]
+
+        public ActionResult OBForm()
+        {
+            var user = User.Identity.Name;
+            var obRec = _RequestManager.GetObRequestByEmployeeId(user);
+
+            var model = new AccountViewModel
+            {
+                obreq = obRec,
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult OBForm(obRequest ob)
+        {
+            var user = User.Identity.Name;
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View("OBForm", new AccountViewModel { obreq = _RequestManager.GetObRequestByEmployeeId(user) });
+                }
+
+                if (_RequestManager.CreateObReq(ob, user, ref ErrorMessage) != ErrorCode.Success)
+                {
+                    ViewBag.Error = "Error creating official business request: " + ErrorMessage;
+                    return View("OBForm", new AccountViewModel { obreq = _RequestManager.GetObRequestByEmployeeId(user) });
+                }
+
+                TempData["SuccessMessage"] = "Official business request created successfully!";
+
+                return RedirectToAction("OBForm");
+
+            }
+            catch (Exception ex)
+            {
+
+                ModelState.AddModelError(string.Empty, $"An error occured: {ex.Message}");
+            }
+            return RedirectToAction("OBForm");
+        }
     }
 }

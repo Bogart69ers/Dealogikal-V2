@@ -38,5 +38,6 @@ namespace Dealogikal.Database
         public virtual DbSet<todoLists> todoLists { get; set; }
         public virtual DbSet<userAccount> userAccount { get; set; }
         public virtual DbSet<vw_Role> vw_Role { get; set; }
+        public virtual DbSet<obRequest> obRequest { get; set; }
     }
 }

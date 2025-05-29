@@ -1339,6 +1339,9 @@
     <Compile Include="Database\notification.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Database\obRequest.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Database\overtimeRequest.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -1544,7 +1547,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Content Include="Views\Home\OfficialBusiness.cshtml" />
+    <Content Include="Views\Home\OfficialBusinessApproval.cshtml" />
+    <Content Include="Views\Admin\OfficialBusinessRequests.cshtml" />
+    <Content Include="Views\Home\OBForm.cshtml" />
+    <Content Include="Views\Admin\RequestLeave.cshtml" />
+    <Content Include="Views\Admin\RequestOvertime.cshtml" />
+    <Content Include="Views\Admin\RequestOBForm.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

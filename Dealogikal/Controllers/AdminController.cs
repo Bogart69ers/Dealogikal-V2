@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -1102,6 +1103,42 @@ namespace Dealogikal.Controllers
             {
                 return Json(new { success = false, message = "Error: " + ex.Message });
             }
+        }
+
+        [Authorize]
+        public ActionResult OfficialBusinessRequests()
+        {
+
+            var obrequests = _RequestManager.GetAllObRequestsDesc();
+
+            var model = new AccountViewModel
+            {
+                employeeInfos = _AccManager.GetAllEmployee(),
+                obreq = obrequests 
+            };
+
+            return View(model);
+        }
+
+        [Authorize]
+
+        public ActionResult RequestLeave()
+        {
+            return View();
+        }
+
+        [Authorize]
+
+        public ActionResult RequestOvertime()
+        {
+            return View();
+        }
+
+        [Authorize]
+
+        public ActionResult RequestOBForm()
+        {
+            return View();
         }
     }
 }

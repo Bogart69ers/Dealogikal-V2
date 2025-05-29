@@ -1,0 +1,477 @@
+﻿@model Dealogikal.ViewModel.AccountViewModel
+
+@{
+    ViewBag.Title = "RequestLeave";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    //var LeaveCount = ViewBag.LeaveCount ?? 0;
+    //var availableLeaveDays = ViewBag.availableLPDays ?? 0;
+    //var pendingLeaveDays = ViewBag.pendingLPDays ?? 0;
+
+}
+
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="row">
+                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                    <h3 class="font-weight-bold">Leave Request Form</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body d-flex flex-column" style="height: 100%;">
+                            <form class="forms-sample d-flex flex-column flex-grow-1" action="@Url.Action("LeaveRequest", "Home")" method="post">
+
+                                <div class="form-group">
+                                    <label for="workMode">Leave Request Type:</label>
+                                    <select id="workMode" class="form-control" style="min-width:100%" required name="leaveRequestType">
+                                        <option value="" disabled selected>Leave Request Type</option>
+                                        <option value="halfday-undertime">Halfday/Undertime</option>
+                                        <option value="sick-leave">Sick Leave</option>
+                                        <option value="vacation-leave">Vacation Leave</option>
+                                        <option value="paternity-leave">Paternity Leave</option>
+                                        <option value="maternity-leave">Maternity Leave</option>
+                                        <option value="emergency-leave">Emergency Leave</option>
+                                        <option value="work-related-accident-leave">Work Related Accident</option>
+                                        <option value="official-business">Official Business</option>
+                                        <option value="bereavement-leave">Bereavement Leave</option>
+                                        <option value="others">Others</option>
+                                    </select>
+                                    <input type="text" id="otherLeaveType" class="form-control mt-2" placeholder="Specify other leave type..." style="display:none; min-width:100%">
+                                </div>
+                                <div class="form-group">
+                                    @*<label for="leaveType">Leave Type:</label>
+                                    <select id="leaveType" class="form-control" style="min-width:100%" name="leaveType" required>
+                                        @if (LeaveCount > 0)
+                                        {
+                                            <option value="leavewithpay">Leave With Pay (LP)</option>
+                                            <option value="leavewithoutpay">Leave Without Pay (LWP)</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="leavewithoutpay">Leave Without Pay (LWP)</option>
+                                        }
+                                    </select>*@
+                                </div>
+                                <div class="form-group">
+                                    <label for="leaveStart">Leave Start:</label>
+                                    <input type="date" class="form-control" id="leaveStart" placeholder="dd/mm/yyyy" style="min-width:100%" name="leaveStart" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="leaveEnd">Leave End:</label>
+                                    <input type="date" class="form-control" id="leaveEnd" placeholder="dd/mm/yyyy" style="min-width:100%" name="leaveEnd" required>
+                                </div>
+
+                                <div class="form-group flex-grow-1">
+                                    <label for="leaveReason">Leave Reason:</label>
+                                    <textarea id="leaveReason" class="form-control" placeholder="Enter reason..." style="height:75%; min-width:100%" name="leaveReason"></textarea>
+                                </div>
+                                <div class="d-flex justify-content-center mt-auto">
+                                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                    <button type="reset" class="btn btn-light">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body d-flex flex-column pb-4">
+                            <!-- Added extra bottom padding -->
+                            <!-- Leave Count -->
+                            <div class="row leave-count-container text-center mb-4">
+                                @*<div class="col-md-4">
+                                    <div class="leave-count-card">
+                                        <p class="leave-count-title">Remaining Leave <br />Count</p>
+                                        <p class="leave-count-number">@LeaveCount</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="leave-count-card">
+                                        <p class="leave-count-title">Pending Request With Pay (Day/s)</p>
+                                        <p class="leave-count-number">@pendingLeaveDays</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="leave-count-card">
+                                        <p class="leave-count-title">Available Leave (After Pending)</p>
+                                        <p class="leave-count-number">@availableLeaveDays</p>
+                                    </div>
+                                </div>*@
+                            </div>
+
+
+
+                            <!-- Search Bar -->
+                            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search..." style="width: 100%; max-width: 100%;">
+
+                            <!-- Table Section -->
+                            <div class="table-responsive flex-grow-1" style="max-height: 100%; overflow-y: auto;">
+                                <table class="table table-striped table-borderless text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Days</th>
+                                            <th>Request Type</th>
+                                            <th>Leave Type</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    @*<tbody>
+                                        @if (Model.leaveRequests != null && Model.leaveRequests.Any())
+                                        {
+                                            foreach (var request in Model.leaveRequests)
+                                            {
+                                                var leaveDays = 0;
+                                                if (request.leaveStart.HasValue && request.leaveEnd.HasValue)
+                                                {
+                                                    leaveDays = (request.leaveEnd.Value - request.leaveStart.Value).Days + 1;
+                                                }
+
+                                                <tr>
+                                                    <td>@request.dateFiled.ToString("MMM dd, yyyy")</td>
+                                                    <td>@leaveDays</td>
+                                                    <td>@request.leaveRequestType</td>
+                                                    <td>
+                                                        @(request.leaveType == "leavewithpay" ? "LP" : request.leaveType == "leavewithoutpay" ? "LWP" : request.leaveType)
+                                                    </td>
+                                                    <td class="font-weight-medium"><div class="badge @(request.status == 0 ? "badge-warning" : request.status == 1 ? "badge-success" :  request.status == 2 ? "badge-danger" : "badge-secondary")">@(request.status == 0 ? "Pending" : request.status == 1 ? "Approved" : request.status == 2 ? "Declined" : "Unknown")</div></td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="6">No Leave Request found.</td>
+                                            </tr>
+                                        }
+                                    </tbody>*@
+                                </table>
+                            </div>
+
+                            <!-- Button at Bottom with More Spacing -->
+                            <div class="mt-4 pt-3 d-flex justify-content-center">
+                                <button type="button" class="btn btn-light btn-rounded btn-icon prev-button" style="display: none;">
+                                    <i class="ti-arrow-left"></i>
+                                </button>
+                                &nbsp; <!-- Space between buttons -->
+                                <button type="button" class="btn btn-primary btn-rounded btn-icon next-button">
+                                    <i class="ti-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <style>
+                .leave-count-container .col-md-4 {
+                    display: flex;
+                    margin-bottom: 10px;
+                }
+
+                .leave-count-card {
+                    background: #4b49ac;
+                    border-radius: 10px;
+                    padding: 20px;
+                    text-align: center;
+                    color: white;
+                    font-size: 16px; /* Slightly smaller for better fit */
+                    font-weight: bold;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    min-height: 150px; /* You can adjust this to match the height you prefer */
+                    width: 100%;
+                    height: 100%;
+                    align-items: center;
+                }
+
+                .leave-count-title {
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                    flex-grow: 1;
+                }
+
+                .leave-count-number {
+                    font-size: 32px;
+                    font-weight: bold;
+                }
+
+
+                /* Ensure table responsiveness */
+                .table-container {
+                    width: 100%;
+                    max-width: 100%;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    display: block;
+                }
+
+                /* Fix column widths */
+                .table {
+                    width: 100%;
+                    table-layout: auto; /* Prevents breaking when zooming out */
+                    border-collapse: collapse;
+                }
+
+                    .table th, .table td {
+                        padding: 12px; /* Add spacing */
+                        text-align: center;
+                        white-space: nowrap; /* Prevents text from wrapping */
+                        overflow: hidden;
+                        text-overflow: ellipsis; /* Adds "..." if text is too long */
+                    }
+
+                    /* Fix table headers */
+                    .table thead {
+                        background: #f8f9fa; /* Light gray header */
+                        font-weight: bold;
+                        position: sticky;
+                        top: 0;
+                        z-index: 2;
+                    }
+
+                    /* Add spacing for better readability */
+                    .table tbody tr {
+                        border-bottom: 1px solid #ddd;
+                    }
+
+                /* Improve badge styling */
+                .badge {
+                    padding: 5px 10px;
+                    border-radius: 8px;
+                    font-size: 12px;
+                }
+
+                /* Fix table breaking when zooming out */
+                .table-responsive {
+                    width: 100%;
+                    max-width: 100%;
+                    overflow-x: auto;
+                }
+            </style>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.getElementById('workMode').addEventListener('change', function () {
+        let otherInput = document.getElementById('otherLeaveType');
+        let leaveStart = document.getElementById('leaveStart');
+        let leaveEnd = document.getElementById('leaveEnd');
+        let today = new Date();
+        let threeDaysLater = new Date();
+        threeDaysLater.setDate(today.getDate() + 3);
+        let minDate = threeDaysLater.toISOString().split('T')[0];
+
+        if (this.value === 'others') {
+            otherInput.style.display = 'block';
+        } else {
+            otherInput.style.display = 'none';
+        }
+
+
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let leaveTypeSelect = document.getElementById("workMode");
+        let leaveStart = document.getElementById("leaveStart");
+        let leaveEnd = document.getElementById("leaveEnd");
+
+        function setMinDateForSickLeave() {
+            let today = new Date();
+            leaveStart.min = today.toISOString().split("T")[0];
+        }
+
+        function setMinDateForEmergencyLeave() {
+            let today = new Date();
+            leaveStart.min = today.toISOString().split("T")[0];
+        }
+
+        function setMinDateForRegularLeave() {
+            let today = new Date();
+            let fourDaysLater = new Date();
+            fourDaysLater.setDate(today.getDate() + 4);
+            leaveStart.min = fourDaysLater.toISOString().split("T")[0];
+        }
+
+        function updateMinDate() {
+            let selectedType = leaveTypeSelect.value;
+
+            if (selectedType === "sick-leave") {
+                setMinDateForSickLeave();
+            } else if (selectedType === "emergency-leave") {
+                setMinDateForEmergencyLeave();
+            } else {
+                setMinDateForRegularLeave();
+            }
+        }
+
+        function updateLeaveEndMinDate() {
+            leaveEnd.min = leaveStart.value; // Leave End cannot be before Leave Start
+        }
+
+        // Ensure Leave End cannot be before Leave Start
+        leaveStart.addEventListener("change", updateLeaveEndMinDate);
+
+        // Set the correct min date on page load
+        updateMinDate();
+
+        // Update min date when leave type changes
+        leaveTypeSelect.addEventListener("change", updateMinDate);
+
+        // Validate on form submit
+        document.querySelector("form").addEventListener("submit", function (event) {
+            let selectedType = leaveTypeSelect.value;
+            let leaveStartDate = new Date(leaveStart.value);
+            let leaveEndDate = new Date(leaveEnd.value);
+            let today = new Date();
+            let fourDaysLater = new Date();
+            fourDaysLater.setDate(today.getDate() + 4);
+
+            // Remove time part for proper comparison
+            today.setHours(0, 0, 0, 0);
+            fourDaysLater.setHours(0, 0, 0, 0);
+            leaveStartDate.setHours(0, 0, 0, 0);
+            leaveEndDate.setHours(0, 0, 0, 0);
+
+            if (
+                (selectedType !== "sick-leave" && selectedType !== "emergency-leave" && leaveStartDate < fourDaysLater) ||
+                (selectedType === "sick-leave" && leaveStartDate < today) ||
+                (selectedType === "emergency-leave" && leaveStartDate < today)
+            ) {
+                event.preventDefault();
+                alert("Invalid leave start date! \n\n- Regular leave must be at least 4 days from today.\n- Sick and emergency leave cannot be before today.");
+            } else if (leaveEndDate < leaveStartDate) {
+                event.preventDefault();
+                alert("Invalid leave end date! \n\n- Leave End date cannot be before the Leave Start date.");
+            }
+        });
+    });
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchInput = document.getElementById("searchInput");
+        let tableRows = document.querySelectorAll(".table tbody tr");
+        let rowsPerPage = 5; // Number of rows per page
+        let currentPage = 0;
+        let prevButton = document.querySelector(".prev-button");
+        let nextButton = document.querySelector(".next-button");
+
+        function getFilteredRows() {
+            let filter = searchInput.value.toLowerCase().trim();
+            return [...tableRows].filter(row => row.textContent.toLowerCase().includes(filter));
+        }
+
+        function showPage(page) {
+            let filteredRows = getFilteredRows();
+            let totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+            tableRows.forEach(row => row.style.display = "none"); // Hide all rows first
+
+            // Show only the filtered and paginated rows
+            filteredRows.forEach((row, index) => {
+                if (index >= page * rowsPerPage && index < (page + 1) * rowsPerPage) {
+                    row.style.display = "table-row";
+                }
+            });
+
+            // Pagination button visibility
+            prevButton.style.display = (page > 0) ? "inline-block" : "none";
+            nextButton.style.display = (page < totalPages - 1) ? "inline-block" : "none";
+
+            currentPage = page; // Update current page
+        }
+
+        searchInput.addEventListener("keyup", function () {
+            currentPage = 0; // Reset to first page when searching
+            showPage(currentPage);
+        });
+
+        nextButton.addEventListener("click", function () {
+            let totalPages = Math.ceil(getFilteredRows().length / rowsPerPage);
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        });
+
+        prevButton.addEventListener("click", function () {
+            if (currentPage > 0) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        });
+
+        showPage(currentPage); // Show first page on load
+    });
+</script>
+@*<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let leaveType = document.getElementById("leaveType");
+        let leaveStart = document.getElementById("leaveStart");
+        let leaveEnd = document.getElementById("leaveEnd");
+
+        // This comes from the server-side ViewBag
+        let leaveCount = @availableLeaveDays;
+
+        function updateLeaveEndMaxDate() {
+            let leaveTypeValue = leaveType.value;
+            let startDateValue = leaveStart.value;
+
+            if (!startDateValue) {
+                leaveEnd.value = '';
+                leaveEnd.removeAttribute('max');
+                return;
+            }
+
+            let startDate = new Date(startDateValue);
+
+            if (leaveTypeValue === "leavewithpay" && leaveCount > 0) {
+                // Set max end date based on leaveCount
+                let maxDate = new Date(startDate);
+                maxDate.setDate(maxDate.getDate() + leaveCount - 1); // minus 1 to count the start day as one leave day
+                let maxDateStr = maxDate.toISOString().split('T')[0];
+
+                leaveEnd.max = maxDateStr;
+
+                // Optional: If the current leaveEnd is beyond max, reset it
+                if (leaveEnd.value && new Date(leaveEnd.value) > maxDate) {
+                    leaveEnd.value = maxDateStr;
+                }
+
+            } else {
+                leaveEnd.removeAttribute('max');
+            }
+        }
+
+        // When Leave Type changes
+        leaveType.addEventListener('change', function () {
+            updateLeaveEndMaxDate();
+        });
+
+        // When Leave Start date changes
+        leaveStart.addEventListener('change', function () {
+            // Make sure leaveEnd can't be before leaveStart
+            if (leaveStart.value) {
+                leaveEnd.min = leaveStart.value;
+            } else {
+                leaveEnd.removeAttribute('min');
+            }
+
+            updateLeaveEndMaxDate();
+        });
+
+        // Initialize on page load
+        updateLeaveEndMaxDate();
+    });
+
+</script>*@
+

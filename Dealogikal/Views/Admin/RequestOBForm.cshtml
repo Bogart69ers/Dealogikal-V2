@@ -1,0 +1,219 @@
+﻿@model Dealogikal.ViewModel.AccountViewModel
+
+@{
+    ViewBag.Title = "RequestOBForm";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="row">
+                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                    <h3 class="font-weight-bold">Official Business Form</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 grid-margin stretch-card" style="justify-content:center;">
+                    <div class="card">
+                        <div class="card-body d-flex flex-column justify-content-between" style="height: 100%;">
+                            <form class="forms-sample d-flex flex-column" style="flex-grow: 1;" action="@Url.Action("OfficialBusiness", "Home")" method="post">
+                                <div class="form-group">
+                                    <label for="obDate" class="mb-2">Official Business Date:</label> <!-- Adjusted gap -->
+                                    <div>
+                                        <input type="date" class="form-control mb-lg-3" id="leaveStart" placeholder="dd/mm/yyyy" style="min-width:100%" name="obDate" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="startTime" class="mb-lg-2">Official Business Start Time:</label>
+                                    <input type="time" class="form-control mb-lg-3" style="min-width:100%" name="startTime" required />
+                                </div>
+                                <div class="form-group">
+                                    <label for="endTime" class="mb-2">Official Business End Time:</label> <!-- Adjusted gap -->
+                                    <input type="time" class="form-control" style="min-width:100%" name="endTime" required />
+                                </div>
+                                <div class="mt-auto mb-3 d-flex justify-content-center">
+                                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                    <button type="reset" class="btn btn-light">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body d-flex flex-column align-items-center">
+                            <!-- 🔍 Search Bar -->
+                            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search..." style="width: 100%; max-width: 100%;">
+                            <div class="table-container">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-borderless text-left">
+                                        <thead>
+                                            <tr>
+                                                <th>Date Filed</th>
+                                                <th>Date</th>
+                                                <th>Start</th>
+                                                <th>End</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        @*<tbody id="overtimeTableBody">
+                                            @if (Model.obreq != null && Model.obreq.Any())
+                                            {
+                                                foreach (var obrequest in Model.obreq)
+                                                {
+                                                    <tr>
+                                                        <td>@(obrequest.dateFiled.ToString("MMM dd, yyyy"))</td>
+                                                        <td>@(obrequest.obDate.ToString("MMM dd, yyyy"))</td>
+                                                        <td>@(obrequest.startTime.ToString("hh:mm tt"))</td>
+                                                        <td>@(obrequest.endTime.ToString("hh:mm tt"))</td>
+                                                        <td class="font-weight-medium"><div class="badge @(obrequest.status == 0 ? "badge-warning" : obrequest.status == 1 ? "badge-success" : obrequest.status == 2 ? "badge-danger": "badge-secondary")">@(obrequest.status == 0 ? "Pending" : obrequest.status == 1 ? "Approved" : obrequest.status == 2 ? "Declined" : "Unknown")</div></td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="6">No Official Business Requests Found.</td>
+                                                </tr>
+                                            }
+                                        </tbody>*@
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- 🟢 Pagination Buttons (Ensure Proper Placement) -->
+                            <div class="mt-4 pt-3 d-flex justify-content-center">
+                                <button type="button" class="btn btn-light btn-rounded btn-icon prev-button" style="display: none;">
+                                    <i class="ti-arrow-left"></i>
+                                </button>
+                                &nbsp;
+                                <button type="button" class="btn btn-primary btn-rounded btn-icon next-button">
+                                    <i class="ti-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <style>
+                .table-container {
+                    width: 100%;
+                    max-width: 100%;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    display: block;
+                    height: 350px; /* Fixed height for 6 rows */
+                }
+
+                /* Fix table structure */
+                .table {
+                    width: 100%;
+                    table-layout: auto;
+                    border-collapse: collapse;
+                }
+
+                    .table th, .table td {
+                        padding: 12px;
+                        text-align: center;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    /* Sticky table header */
+                    .table thead {
+                        background: #f8f9fa;
+                        font-weight: bold;
+                        position: sticky;
+                        top: 0;
+                        z-index: 2;
+                    }
+
+                /* Pagination Button Alignment */
+                /* Ensure buttons are visible */
+                .mt-4.pt-3 {
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                }
+
+                /* Ensure buttons are not hidden */
+                .prev-button, .next-button {
+                    visibility: visible;
+                    opacity: 1;
+                }
+
+                /* Ensure button alignment */
+                .prev-button {
+                    background-color: #f8f9fa;
+                    color: black;
+                }
+
+                .next-button {
+                    background-color: #4b49ac;
+                    color: white;
+                }
+            </style>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchInput = document.getElementById("searchInput");
+        let tableBody = document.getElementById("overtimeTableBody");
+        let tableRows = [...tableBody.querySelectorAll("tr")]; // Convert NodeList to Array
+        let rowsPerPage = 6; // Number of rows per page
+        let currentPage = 0;
+        let prevButton = document.querySelector(".prev-button");
+        let nextButton = document.querySelector(".next-button");
+
+        function getFilteredRows() {
+            let filter = searchInput.value.toLowerCase().trim();
+            return tableRows.filter(row => row.textContent.toLowerCase().includes(filter));
+        }
+
+        function showPage(page) {
+            let filteredRows = getFilteredRows();
+            let totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+            tableRows.forEach(row => row.style.display = "none"); // Hide all rows first
+
+            // Show only the filtered and paginated rows
+            filteredRows.forEach((row, index) => {
+                if (index >= page * rowsPerPage && index < (page + 1) * rowsPerPage) {
+                    row.style.display = "table-row";
+                }
+            });
+
+            // Update pagination button visibility
+            prevButton.style.display = (page > 0) ? "inline-block" : "none";
+            nextButton.style.display = (page < totalPages - 1) ? "inline-block" : "none";
+
+            currentPage = page; // Update current page
+        }
+
+        searchInput.addEventListener("keyup", function () {
+            currentPage = 0; // Reset to first page when searching
+            showPage(currentPage);
+        });
+
+        nextButton.addEventListener("click", function () {
+            let totalPages = Math.ceil(getFilteredRows().length / rowsPerPage);
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        });
+
+        prevButton.addEventListener("click", function () {
+            if (currentPage > 0) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        });
+
+        showPage(currentPage); // Show first page on load
+    });
+</script>
+

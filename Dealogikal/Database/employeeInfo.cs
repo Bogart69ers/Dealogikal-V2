@@ -25,6 +25,7 @@ namespace Dealogikal.Database
             this.overtimeRequest = new HashSet<overtimeRequest>();
             this.todoLists = new HashSet<todoLists>();
             this.userAccount = new HashSet<userAccount>();
+            this.obRequest = new HashSet<obRequest>();
         }
     
         public string employeeId { get; set; }
@@ -60,5 +61,7 @@ namespace Dealogikal.Database
         public virtual ICollection<todoLists> todoLists { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<userAccount> userAccount { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<obRequest> obRequest { get; set; }
     }
 }

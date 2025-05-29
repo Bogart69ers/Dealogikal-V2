@@ -1,6 +1,7 @@
-﻿
+﻿@model Dealogikal.ViewModel.AccountViewModel
+
 @{
-    ViewBag.Title = "OfficialBusiness";
+    ViewBag.Title = "OBForm";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -17,20 +18,20 @@
                 <div class="col-md-4 grid-margin stretch-card" style="justify-content:center;">
                     <div class="card">
                         <div class="card-body d-flex flex-column justify-content-between" style="height: 100%;">
-                            <form class="forms-sample d-flex flex-column" style="flex-grow: 1;" action="@Url.Action("OvertimeRequest", "Home")" method="post">
+                            <form class="forms-sample d-flex flex-column" style="flex-grow: 1;" action="@Url.Action("OfficialBusiness", "Home")" method="post">
                                 <div class="form-group">
-                                    <label for="OBDate" class="mb-2">Official Business Date:</label> <!-- Adjusted gap -->
+                                    <label for="obDate" class="mb-2">Official Business Date:</label> <!-- Adjusted gap -->
                                     <div>
-                                        <input type="date" class="form-control mb-lg-3" id="leaveStart" placeholder="dd/mm/yyyy" style="min-width:100%" name="overtimeDate" required>
+                                        <input type="date" class="form-control mb-lg-3" id="leaveStart" placeholder="dd/mm/yyyy" style="min-width:100%" name="obDate" required>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="OBStartTime" class="mb-lg-2">Official Business Start Time:</label> <!-- Adjusted gap -->
-                                    <input type="time" class="form-control mb-lg-3" style="min-width:100%" name="obStartTime" required />
+                                    <label for="startTime" class="mb-lg-2">Official Business Start Time:</label>
+                                    <input type="time" class="form-control mb-lg-3" style="min-width:100%" name="startTime" required />
                                 </div>
                                 <div class="form-group">
-                                    <label for="OBEndTime" class="mb-2">Official Business End Time:</label> <!-- Adjusted gap -->
-                                    <input type="time" class="form-control" style="min-width:100%" name="obEndTime" required />
+                                    <label for="endTime" class="mb-2">Official Business End Time:</label> <!-- Adjusted gap -->
+                                    <input type="time" class="form-control" style="min-width:100%" name="endTime" required />
                                 </div>
                                 <div class="mt-auto mb-3 d-flex justify-content-center">
                                     <button type="submit" class="btn btn-primary mr-2">Submit</button>
@@ -52,32 +53,32 @@
                                             <tr>
                                                 <th>Date Filed</th>
                                                 <th>Date</th>
-                                                <th>Overtime Start</th>
-                                                <th>Overtime End</th>
+                                                <th>Start</th>
+                                                <th>End</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
-                                        @*<tbody id="overtimeTableBody">
-                                                @if (Model.overtimeRequests != null && Model.overtimeRequests.Any())
-                                                {
-                                                    foreach (var otrequest in Model.overtimeRequests)
-                                                    {
-                                                        <tr>
-                                                            <td>@(otrequest.dateFiled.ToString("MMM dd, yyyy"))</td>
-                                                            <td>@(otrequest.overtimeDate.HasValue ? otrequest.overtimeDate.Value.ToString("MMM dd, yyyy") : "N/A")</td>
-                                                            <td>@(otrequest.overtimeStart.HasValue ? otrequest.overtimeStart.Value.ToString("hh:mm tt") : "N/A")</td>
-                                                            <td>@(otrequest.overtimeEnd.HasValue ? otrequest.overtimeEnd.Value.ToString("hh:mm tt") : "N/A")</td>
-                                                            <td class="font-weight-medium"><div class="badge @(otrequest.status == 0 ? "badge-warning" : otrequest.status == 1 ? "badge-success" : otrequest.status == 2 ? "badge-danger": "badge-secondary")">@(otrequest.status == 0 ? "Pending" : otrequest.status == 1 ? "Approved" : otrequest.status == 2 ? "Declined" : "Unknown")</div></td>
-                                                        </tr>
-                                                    }
-                                                }
-                                                else
+                                        <tbody id="overtimeTableBody">
+                                            @if (Model.obreq != null && Model.obreq.Any())
+                                            {
+                                                foreach (var obrequest in Model.obreq)
                                                 {
                                                     <tr>
-                                                        <td colspan="6">No Official Business Requests Found.</td>
+                                                        <td>@(obrequest.dateFiled.ToString("MMM dd, yyyy"))</td>
+                                                        <td>@(obrequest.obDate.ToString("MMM dd, yyyy"))</td>
+                                                        <td>@(obrequest.startTime.ToString("hh:mm tt"))</td>
+                                                        <td>@(obrequest.endTime.ToString("hh:mm tt"))</td>
+                                                        <td class="font-weight-medium"><div class="badge @(obrequest.status == 0 ? "badge-warning" : obrequest.status == 1 ? "badge-success" : obrequest.status == 2 ? "badge-danger": "badge-secondary")">@(obrequest.status == 0 ? "Pending" : obrequest.status == 1 ? "Approved" : obrequest.status == 2 ? "Declined" : "Unknown")</div></td>
                                                     </tr>
                                                 }
-                                            </tbody>*@
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="6">No Official Business Requests Found.</td>
+                                                </tr>
+                                            }
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>

@@ -271,32 +271,43 @@
                             </ul>
                         </div>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
                             <i class="icon-paper-stack menu-icon"></i>
-                            <span class="menu-title">Request</span>
+                            <span class="menu-title">Requests</span>
                             <i class="menu-arrow"></i>
                         </a>
                         <div class="collapse" id="ui-basic">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" href="~/Home/LeaveRequest">Request Leave</a></li>
+                                <li class="nav-item"><a class="nav-link" href="~/Home/OvertimeRequest">Request Overtime</a></li>
+                                <li class="nav-item"><a class="nav-link" href="~/Home/OBForm">Request OB</a></li>
+                            </ul>
+                        </div>
+                    </li>
 
-                            @if (ViewBag.EmployeeInfo != null && ViewBag.EmployeeInfo.position == "Department Head")
-                            {
+                    @if (ViewBag.EmployeeInfo != null && ViewBag.EmployeeInfo.position == "Department Head")
+                    {
+                        <!-- Approvals -->
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+                                <i class="icon-paper-stack menu-icon"></i>
+                                <span class="menu-title">Approvals</span>
+                                <i class="menu-arrow"></i>
+                            </a>
+
+                            <div class="collapse" id="charts">
                                 <ul class="nav flex-column sub-menu">
                                     <li class="nav-item"><a class="nav-link" href="~/Home/LeaveApproval">Leave Requests</a></li>
                                     <li class="nav-item"><a class="nav-link" href="~/Home/OvertimeApproval">Overtime Requests</a></li>
-                                    @*<li class="nav-item"><a class="nav-link" href="~/Home/OfficialBusiness">OB Form Requests</a></li>*@
+                                    <li class="nav-item"><a class="nav-link" href="~/Home/OfficialBusinessApproval">OB Form Requests</a></li>
                                 </ul>
-                            }
-                            else if (ViewBag.EmployeeInfo != null)
-                            {
-                                <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item"><a class="nav-link" href="~/Home/LeaveRequest">Request Leave</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="~/Home/OvertimeRequest">Request Overtime</a></li>
-                                    @*<li class="nav-item"><a class="nav-link" href="~/Home/OfficialBusiness">OB Form</a></li>*@
-                                </ul>
-                            }
-                        </div>
-                    </li>
+                            </div>
+                        </li>
+                    }
+                    <!-- Requests -->
+
 
                     @if (ViewBag.EmployeeInfo != null && ViewBag.EmployeeInfo.department == "IT")
                     {
@@ -308,7 +319,7 @@
                         </li>
                     }
                 </ul>
-            </nav>
+                </nav>
             <!-- partial -->
             <div class="main-panel">
 

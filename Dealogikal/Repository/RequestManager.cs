@@ -11,13 +11,32 @@ namespace Dealogikal.Repository
     {
         private BaseRepository<leaveRequest> _leaveReq;
         private BaseRepository<overtimeRequest> _overtReq;
+        private BaseRepository<obRequest> _obReq;
 
         public RequestManager()
         {
             _leaveReq = new BaseRepository<leaveRequest>();
             _overtReq = new BaseRepository<overtimeRequest>();
+            _obReq = new BaseRepository<obRequest>();
+        }
+        public obRequest GetObRequestById(int obId)
+        {
+            return _obReq.Get(obId);
         }
 
+        public List<obRequest> GetObRequestByEmployeeId(string employeeId)
+        {
+            return _obReq._table.Where(o => o.employeeId == employeeId).OrderByDescending(o => o.dateFiled).ToList();
+        }
+
+        public List<obRequest> GetAllObRequestsDesc()
+        {
+            return _obReq.GetAll()
+                          .OrderBy(l => l.status != 0)
+                          .ThenByDescending(l => l.dateFiled)
+                          .ToList();
+        }
+      
         public leaveRequest GetLeaveRequestbyRequestId(int requestId)
         {
             return _leaveReq.Get(requestId);
@@ -62,6 +81,7 @@ namespace Dealogikal.Repository
                 .ThenByDescending(l => l.dateFiled) 
                 .ToList();
         }
+       
 
         public leaveRequest GetLeaveRequestByRequestId(int requestId)
         {
@@ -71,6 +91,67 @@ namespace Dealogikal.Repository
         public overtimeRequest GetOvertimeByRequestdId(int requestId)
         {
             return _overtReq.Get(requestId);
+        }
+
+        public ErrorCode CreateObReq(obRequest ob, string employeeId, ref string errMsg)
+        {
+            try
+            {
+                DateTime serverTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "Singapore Standard Time");
+                ob.dateFiled = serverTime;
+                ob.employeeId = employeeId;
+                ob.status = 0;
+                if (_obReq.Create(ob, out errMsg) != ErrorCode.Success)
+                {
+                    return ErrorCode.Error;
+                }
+                return ErrorCode.Success;
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+        public ErrorCode ApproveObRequest(int obId, ref string errMsg)
+        {
+            try
+            {
+                var request = GetObRequestById(obId);
+                if (request == null)
+                {
+                    errMsg = "No request found";
+                    return ErrorCode.Error;
+                }
+                request.status = 1; // Approve status
+                return _obReq.Update(obId, request, out errMsg);
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
+        }
+
+        public ErrorCode DeclineObRequest(int obId, ref string errMsg)
+        {
+            try
+            {
+                var request = GetObRequestById(obId);
+                if (request == null)
+                {
+                    errMsg = "No request found";
+                    return ErrorCode.Error;
+                }
+                request.status = 2; // Decline status
+                return _obReq.Update(obId, request, out errMsg);
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return ErrorCode.Error;
+            }
         }
 
         public ErrorCode CreateLeave(leaveRequest lr, string employeeId, ref string errMsg)
@@ -121,7 +202,7 @@ namespace Dealogikal.Repository
             }
         }
 
-        public ErrorCode ApproveLeaveRequest(string employeeId, int requestId, ref string errMsg)
+        public ErrorCode ApproveLeaveRequest(int requestId, ref string errMsg)
         {
             try
             {
@@ -140,7 +221,7 @@ namespace Dealogikal.Repository
                 return ErrorCode.Error;
             }
         }
-        public ErrorCode ApproveOvertimeRequest(string employeeId, int requestId, ref string errMsg)
+        public ErrorCode ApproveOvertimeRequest(int requestId, ref string errMsg)
         {
             try
             {
@@ -160,7 +241,7 @@ namespace Dealogikal.Repository
             }
         }
 
-        public ErrorCode DeclineLeaveRequest(string employeeId, int requestId, ref string errMsg)
+        public ErrorCode DeclineLeaveRequest(int requestId, ref string errMsg)
         {
             try
             {
@@ -179,7 +260,7 @@ namespace Dealogikal.Repository
                 return ErrorCode.Error;
             }
         }
-        public ErrorCode DeclineOvertimeRequest(string employeeId, int requestId, ref string errMsg)
+        public ErrorCode DeclineOvertimeRequest(int requestId, ref string errMsg)
         {
             try
             {

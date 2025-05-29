@@ -62,10 +62,9 @@ else
                             </select>
 
                             <div class="button-group">
-                                <button type="submit" id="btn1" class="btn btn-inverse-info" name="action" value="">Time In</button>
-                                <button type="submit" id="btn2" class="btn btn-inverse-dark" name="action" value="">Time In</button>
-
+                                <button type="submit" id="btn1" class="btn btn-primary" name="action" value="" style="min-width:200px;">Time In</button>
                             </div>
+
                         </div>
                     </form>
 
@@ -133,66 +132,57 @@ else
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    function updateButtons() {
-
+    function updateButton() {
         const now = getSyncedNow();
-
-        // Convert UTC to Singapore Time (UTC+8)
         const currentHour = now.getHours();
         const currentMinute = now.getMinutes();
 
-        var timeInVal = $('#timeIn').val();
-        var breakInVal = $('#breakIn').val();
-        var breakOutVal = $('#breakOut').val();
-        var timeOutVal = $('#timeOut').val();
+        const timeIn = $('#timeIn').val();
+        const breakIn = $('#breakIn').val();
+        const breakOut = $('#breakOut').val();
+        const timeOut = $('#timeOut').val();
 
-        var btn1 = $('#btn1');
-        var btn2 = $('#btn2');
+        const btn1 = $('#btn1');
+
 
         if (currentHour === 12 && currentMinute >= 16 && currentMinute <= 44) {
-            // ⛔ Disabled Period: 12:16 - 12:44 PM
-            btn1.prop("disabled", true);
-            btn2.prop("disabled", true);
+            btn1.text("Break").prop("disabled", true);
         }
         else if (currentHour < 12 || (currentHour === 12 && currentMinute <= 15)) {
             // 🌅 Morning Shift
-            if (!timeInVal) {
+            if (!timeIn) {
                 btn1.text("Time In").val("TimeIn").prop("disabled", false);
-                btn2.text("Time Out").val("BreakIn").prop("disabled", true);
-            } else if (timeInVal && !breakInVal) {
-                btn1.prop("disabled", true);
-                btn2.text("Time Out").val("BreakIn").prop("disabled", false);
+            } else if (timeIn && !breakIn) {
+                btn1.text("Time Out/ Break In").val("BreakIn").prop("disabled", false);
             } else {
                 btn1.prop("disabled", true);
-                btn2.prop("disabled", true);
             }
         }
         else if (currentHour > 12 || (currentHour === 12 && currentMinute >= 45)) {
             // 🌇 Afternoon Shift
-            if (!breakOutVal) {
-                btn1.text("Time In").val("BreakOut").prop("disabled", false);
-                btn2.text("Time Out").val("TimeOut").prop("disabled", true);
-            } else if (breakOutVal && !timeOutVal) {
-                btn1.prop("disabled", true);
-                btn2.text("Time Out").val("TimeOut").prop("disabled", false);
+            if (!breakOut) {
+                btn1.text("Time In/ Break Out").val("BreakOut").prop("disabled", false);
+            } else if (breakOut && !timeOut) {
+                btn1.text("Time Out").val("TimeOut").prop("disabled", false);
             } else {
                 btn1.prop("disabled", true);
-                btn2.prop("disabled", true);
             }
         }
-
     }
 
-    // Run button update on page load
     $(document).ready(function () {
-        updateButtons();
-        setInterval(updateButtons, 1000);
+        updateButton();
+        setInterval(updateButton, 1000);
     });
 </script>
+
 
 <script>
     function updateClock() {
         const now = getSyncedNow();
+
+        now.setMinutes(now.getMinutes() + 4);
+        now.setSeconds(now.getSeconds() + 29);
 
         let hours = now.getHours();
         const minutes = now.getMinutes();
@@ -244,13 +234,17 @@ else
 </script>
 
 <script>
-    document.getElementById("btn2").addEventListener("click", function (e) {
-        const confirmed = confirm("Are you sure you want to time out?");
-        if (!confirmed) {
-            e.preventDefault(); // Stop the form from submitting
+        document.getElementById("btn1").addEventListener("click", function (e) {
+        const value = this.value;
+        if (true) {
+            const confirmed = confirm("Are you sure you want to do this action?");
+            if (!confirmed) {
+                e.preventDefault();
+            }
         }
     });
 </script>
+
 <script>
     // Injected server time as base reference
     const serverTime = new Date("@serverTime.ToString("yyyy-MM-ddTHH:mm:ss")");

@@ -39,6 +39,10 @@ namespace Dealogikal.ViewModel
 
         public List<notification> notifs { get; set; }
 
+        public List<obRequest> obreq { get; set; }
+
+        public obRequest obreqs { get; set; }
+
         public string AvatarUrl { get; set; }
     }
 }
