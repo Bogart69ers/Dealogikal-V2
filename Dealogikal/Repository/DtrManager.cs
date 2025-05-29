@@ -95,7 +95,7 @@ namespace Dealogikal.Repository
                 dtr.employeeId = employeeId;
                 dtr.createdAt = serverTime.Date;
                 dtr.date = serverTime.Date;
-                dtr.timeIn = serverTime.Add(new TimeSpan(0,4,29));
+                dtr.timeIn = serverTime.Add(new TimeSpan(0,3,29));
 
                 if (_dtrRecords.Create(dtr, out errMsg) != ErrorCode.Success)
                 {
@@ -123,7 +123,7 @@ namespace Dealogikal.Repository
                     errMsg = "No record found for Break In.";
                     return ErrorCode.Error;
                 }
-                record.breakIn = serverTime.Add(new TimeSpan(0, 4, 29));
+                record.breakIn = serverTime.Add(new TimeSpan(0, 3, 29));
                 return _dtrRecords.Update(recordId, record, out errMsg);
             }
             catch (Exception ex)
@@ -152,7 +152,7 @@ namespace Dealogikal.Repository
                     newRecord.createdAt = serverTime.Date;
                     newRecord.date = serverTime.Date;
                     newRecord.workMode = workmode;
-                    newRecord.breakOut = serverTime.Add(new TimeSpan(0, 4, 29));
+                    newRecord.breakOut = serverTime.Add(new TimeSpan(0, 3, 29));
 
                     return _dtrRecords.Create(newRecord, out errMsg);
                 }
@@ -184,7 +184,7 @@ namespace Dealogikal.Repository
                     return ErrorCode.Error;
                 }
 
-                record.timeOut = serverTime.Add(new TimeSpan(0, 4, 29));
+                record.timeOut = serverTime.Add(new TimeSpan(0, 3, 29));
 
                 return _dtrRecords.Update(recordId, record, out errMsg);
             }

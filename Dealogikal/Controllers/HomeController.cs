@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office2016.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Dealogikal.Controllers
 {
@@ -1426,6 +1427,8 @@ namespace Dealogikal.Controllers
         public ActionResult OBForm(obRequest ob)
         {
             var user = User.Identity.Name;
+            var userInfo = _AccManager.GetEmployeebyEmployeeId(user);
+            string errMsg = string.Empty;
             try
             {
                 if (!ModelState.IsValid)
@@ -1437,6 +1440,25 @@ namespace Dealogikal.Controllers
                 {
                     ViewBag.Error = "Error creating official business request: " + ErrorMessage;
                     return View("OBForm", new AccountViewModel { obreq = _RequestManager.GetObRequestByEmployeeId(user) });
+                }
+
+                var notifManager = new NotificationManager();
+                var deptHead = _AccManager.GetDepartmentHeadByDepartment(userInfo.department);
+
+                if (deptHead != null)
+                {
+                    notifManager.CreateNotification(
+                    deptHead.employeeId,
+                        userInfo.employeeId,
+                    "Pending Official Business Request",
+                    $"{userInfo.firstName} {userInfo.lastName} has submitted an Official Business request.",
+                    ref errMsg
+                    );
+
+                }
+                else
+                {
+                    Console.WriteLine("No department head found for department: " + userInfo.department);
                 }
 
                 TempData["SuccessMessage"] = "Official business request created successfully!";
