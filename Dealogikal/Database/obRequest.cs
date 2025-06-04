@@ -21,6 +21,7 @@ namespace Dealogikal.Database
         public System.DateTime startTime { get; set; }
         public System.DateTime endTime { get; set; }
         public int status { get; set; }
+        public string obReason { get; set; }
     
         public virtual employeeInfo employeeInfo { get; set; }
     }

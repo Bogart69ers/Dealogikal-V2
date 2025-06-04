@@ -33,11 +33,11 @@ namespace Dealogikal.Database
         public virtual DbSet<leaveRequest> leaveRequest { get; set; }
         public virtual DbSet<loginLogs> loginLogs { get; set; }
         public virtual DbSet<notification> notification { get; set; }
+        public virtual DbSet<obRequest> obRequest { get; set; }
         public virtual DbSet<overtimeRequest> overtimeRequest { get; set; }
         public virtual DbSet<role> role { get; set; }
         public virtual DbSet<todoLists> todoLists { get; set; }
         public virtual DbSet<userAccount> userAccount { get; set; }
         public virtual DbSet<vw_Role> vw_Role { get; set; }
-        public virtual DbSet<obRequest> obRequest { get; set; }
     }
 }

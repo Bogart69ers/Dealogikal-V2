@@ -257,5 +257,109 @@ namespace Dealogikal.Repository
                 return ErrorCode.Error;
             }
         }
+
+
+        public ErrorCode DHObEmail(string firstName, string lastName, string obReason ,DateTime obDate, DateTime startTime, DateTime endTime,int status, ref string errMsg, string corporation = "Dealogikal")
+        {
+            try
+            {
+                var email = "isk@dealogikal.com";
+                string errorMessage = "";
+                var mailManager = new MailManager();
+                string subject = "Official Business Request From " + firstName;
+                string logoUrl = corporation.ToLower() == "dealogikal"
+                   ? "https://www.dealogikal.com/images/dealogikal_dark.png"
+                   : "http://knotticalpower.com/wp-content/uploads/2023/03/kpec-logo.png";
+                // Convert status int to label and color
+                string body = $@"
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                      <meta charset='UTF-8'>
+                      <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                      <title>Leave Request Update</title>
+                    </head>
+                    <body style='margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;'>
+                      <table align='center' cellpadding='0' cellspacing='0' width='100%' style='padding: 20px 0;'>
+                        <tr>
+                          <td align='center'>
+                            <table cellpadding='0' cellspacing='0' width='600' style='background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+                              <tr>
+                                <td align='center' style='background-color: #cfd0d1; padding: 30px;'>
+                                    <img src='{logoUrl}' alt='{corporation} Logo' width='180' style='display: block;' />
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <td style='padding: 40px 30px 20px 30px;'>
+                                  <h2 style='color: #333333; text-align: center; margin-bottom: 10px;'>Official Business Request</h2>
+                                  <p style='color: #555555; font-size: 16px; text-align: center;'>Good Day <strong>Sir Ira</strong></p>
+                                  <p style='color: #666666; font-size: 16px; text-align: center;'>
+                                   <strong>{firstName} {lastName}</strong> submitted a Official Business request
+                                  </p>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <td style='padding: 20px 30px;'>
+                                  <table cellpadding='10' cellspacing='0' width='100%' style='border: 1px solid #ddd; border-radius: 6px; background-color: #f9f9f9;'>
+                                    <tr>
+                                      <td style='font-size: 16px; color: #555;'>Reason:</td>
+                                      <td style='font-size: 16px; color: #333;'><strong>{obReason}</strong></td>
+                                    </tr> 
+                                    <tr>
+                                      <td style='font-size: 16px; color: #555;'>Date:</td>
+                                      <td style='font-size: 16px; color: #333;'><strong>{obDate:MMMM dd, yyyy}</strong></td>
+                                    </tr>
+                                    <tr>
+                                      <td style='font-size: 16px; color: #555;'>Start Time:</td>
+                                      <td style='font-size: 16px; color: #333;'><strong>{startTime:hh:mm tt}</strong></td>
+                                    </tr>
+                                    <tr>
+                                      <td style='font-size: 16px; color: #555;'>End Time:</td>
+                                      <td style='font-size: 16px; color: #333;'><strong>{endTime:hh:mm tt}</strong></td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style='padding: 20px 30px;'>
+                                  <p style='color: #888888; font-size: 14px; line-height: 1.6;'>
+                                    If you have any questions or need further clarification, feel free to contact the IT Department or HR Department.
+                                  </p>
+                                  <p style='color: #888888; font-size: 14px;'>Thank you,<br /><strong>The {corporation} Department Head</strong></p>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <td align='center' style='background-color: #cfd0d1; padding: 15px; font-size: 12px; color: #333333;'>
+                                  &copy; 2023 Dealogikal. All rights reserved.
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </body>
+                    </html>";
+
+                bool isSent = SendEmail(email, subject, body, ref errorMessage);
+                if (isSent)
+                {
+                    errMsg = "Email sent successfully.";
+                    return ErrorCode.Success;
+                }
+                else
+                {
+                    errMsg = errorMessage;
+                    return ErrorCode.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                errMsg = $"An error occurred: {ex.Message}";
+                return ErrorCode.Error;
+            }
+        }
     }
 }

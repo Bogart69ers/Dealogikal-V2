@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using ClosedXML.Excel;
 using Dealogikal.Database;
+using Dealogikal.Repository;
 using Dealogikal.Utils;
 using Dealogikal.ViewModel;
 
@@ -1124,21 +1125,272 @@ namespace Dealogikal.Controllers
 
         public ActionResult RequestLeave()
         {
-            return View();
+            var user = _AccManager.GetEmployeebyEmployeeId(User.Identity.Name);
+            var currentUserId = User.Identity.Name;
+
+            int leaveCount = user.leaveCount ?? 0;
+
+            var pendingLPRequests = _RequestManager.GetLeaveRequestByEmployeeId(currentUserId)
+                .Where(r => r.status == 0 && r.leaveType == "leavewithpay")
+                .ToList();
+
+            int pendingLPDays = pendingLPRequests.Sum(r =>
+            {
+                if (!r.leaveStart.HasValue || !r.leaveEnd.HasValue)
+                    return 0;
+                return (r.leaveEnd.Value - r.leaveStart.Value).Days + 1;
+            });
+
+            int availableLPDays = leaveCount - pendingLPDays;
+
+            ViewBag.LeaveCount = leaveCount;
+            ViewBag.AvailableLPDays = availableLPDays;
+            ViewBag.PendingLPDays = pendingLPDays;
+
+            var requests = _RequestManager.GetLeaveRequestByEmployeeId(currentUserId);
+
+            var model = new AccountViewModel
+            {
+                leaveRequests = requests
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+
+        public ActionResult RequestLeave(leaveRequest lr)
+        {
+            try
+            {
+                var user = User.Identity.Name;
+                var userInfo = _AccManager.GetEmployeebyEmployeeId(user);
+                string errMsg = string.Empty;
+
+                if (userInfo == null)
+                {
+                    ViewBag.ErrorMessage = "User not found.";
+
+                    var fallbackRequests = _RequestManager.GetLeaveRequestByEmployeeId(user);
+                    var fallbackModel = new AccountViewModel
+                    {
+                        leaveRequests = fallbackRequests
+                    };
+
+                    return View("RequestLeave", fallbackModel);
+                }
+
+                if (lr.leaveType == "leavewithpay")
+                {
+                    var pendingLPRequests = _RequestManager.GetLeaveRequestByEmployeeId(user)
+                        .Where(r => r.status == 0 && r.leaveType == "leavewithpay")
+                        .ToList();
+
+                    int reservedDays = pendingLPRequests.Sum(r =>
+                    {
+                        if (!r.leaveStart.HasValue || !r.leaveEnd.HasValue)
+                            return 0;
+                        return (r.leaveEnd.Value - r.leaveStart.Value).Days + 1;
+                    });
+
+                    int availableLeaveDays = (userInfo.leaveCount ?? 0) - reservedDays;
+
+                    if (!lr.leaveStart.HasValue || !lr.leaveEnd.HasValue)
+                    {
+                        ViewBag.ErrorMessage = "Leave Start and End dates are required.";
+
+                        var fallbackRequests = _RequestManager.GetLeaveRequestByEmployeeId(user);
+                        var fallbackModel = new AccountViewModel
+                        {
+                            leaveRequests = fallbackRequests
+                        };
+
+                        return View("RequestLeave", fallbackModel);
+                    }
+
+                    int requestedDays = (lr.leaveEnd.Value - lr.leaveStart.Value).Days + 1;
+
+                    if (requestedDays > availableLeaveDays)
+                    {
+                        ViewBag.ErrorMessage = $"You only have {availableLeaveDays} Leave With Pay days remaining after pending requests. Please adjust your leave dates.";
+
+                        var fallbackRequests = _RequestManager.GetLeaveRequestByEmployeeId(user);
+                        var fallbackModel = new AccountViewModel
+                        {
+                            leaveRequests = fallbackRequests
+                        };
+
+                        return View("RequestLeave", fallbackModel);
+                    }
+                }
+
+                if (_RequestManager.CreateLeave(lr, user, ref errMsg) != ErrorCode.Success)
+                {
+                    ViewBag.ErrorMessage = errMsg;
+
+                    var fallbackRequests = _RequestManager.GetLeaveRequestByEmployeeId(user);
+                    var fallbackModel = new AccountViewModel
+                    {
+                        leaveRequests = fallbackRequests
+                    };
+
+                    return View("RequestLeave", fallbackModel);
+                }
+
+                var notifManager = new NotificationManager();
+                var deptHead = _AccManager.GetDepartmentHeadByDepartment(userInfo.department);
+
+                if (userInfo.position == "Department Head")
+                {
+                    _MailManager.DHLeaveEmail(
+                    userInfo.firstName,
+                    userInfo.lastName,
+                    lr.leaveType,
+                    lr.leaveStart.Value,
+                    lr.leaveEnd.Value,
+                    lr.status.Value,
+                    ref errMsg,
+                    userInfo.corporation
+                );
+                }
+
+                return RedirectToAction("RequestLeave");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+
+                var fallbackRequests = _RequestManager.GetLeaveRequestByEmployeeId(User.Identity.Name);
+                var fallbackModel = new AccountViewModel
+                {
+                    leaveRequests = fallbackRequests
+                };
+
+                return View("RequestLeave", fallbackModel);
+            }
         }
 
         [Authorize]
 
         public ActionResult RequestOvertime()
         {
-            return View();
+            var user = _AccManager.GetEmployeebyEmployeeId(User.Identity.Name);
+            var currentUserId = User.Identity.Name;
+
+            ViewBag.LeaveCount = user.leaveCount;
+
+            var requests = _RequestManager.GetOvertimeRequestByEmployeeId(currentUserId);
+
+            var model = new AccountViewModel
+            {
+                overtimeRequests = requests,
+
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+
+        public ActionResult RequestOvertime(overtimeRequest ot)
+        {
+            try
+            {
+                var user = User.Identity.Name;
+                var userInfo = _AccManager.GetEmployeebyEmployeeId(user);
+                string errMsg = string.Empty;
+
+                if (userInfo == null)
+                {
+                    ViewBag.ErrorMessage = "User not found.";
+                    return View("RequestOvertime");
+                }
+
+                if (_RequestManager.CreateOvertime(ot, user, ref errMsg) != ErrorCode.Success)
+                {
+                    ViewBag.ErrorMessage = errMsg;
+                    return View("RequestOvertime");
+                }
+
+                var notifManager = new NotificationManager();
+                var deptHead = _AccManager.GetDepartmentHeadByDepartment(userInfo.department);
+
+
+                return RedirectToAction("RequestOvertime");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return View("RequestOvertime");
+            }
         }
 
         [Authorize]
 
         public ActionResult RequestOBForm()
         {
-            return View();
+            var user = User.Identity.Name;
+            var obRec = _RequestManager.GetObRequestByEmployeeId(user);
+
+            var model = new AccountViewModel
+            {
+                obreq = obRec,
+            };
+            return View(model);
+        }
+
+        [HttpPost] 
+        [Authorize]
+        public ActionResult RequestOBForm(obRequest ob)
+        {
+            var user = User.Identity.Name;
+            var userInfo = _AccManager.GetEmployeebyEmployeeId(user);
+            string errMsg = string.Empty;
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View("RequestOBForm", new AccountViewModel { obreq = _RequestManager.GetObRequestByEmployeeId(user) });
+                }
+
+                if (_RequestManager.CreateObReq(ob, user, ref ErrorMessage) != ErrorCode.Success)
+                {
+                    ViewBag.Error = "Error creating official business request: " + ErrorMessage;
+                    return View("RequestOBForm", new AccountViewModel { obreq = _RequestManager.GetObRequestByEmployeeId(user) });
+                }
+
+                var notifManager = new NotificationManager();
+                var deptHead = _AccManager.GetDepartmentHeadByDepartment(userInfo.department);
+
+                if(userInfo.position == "Department Head")
+                {
+                    _MailManager.DHObEmail(
+                        userInfo.firstName,
+                        userInfo.lastName,        
+                        ob.obReason,
+                        ob.obDate,
+                        ob.startTime,
+                        ob.endTime,
+                        ob.status,
+                        ref errMsg,
+                        userInfo.corporation
+                    );
+                }
+                
+
+                TempData["SuccessMessage"] = "Official business request created successfully!";
+
+                return RedirectToAction("RequestOBForm");
+
+            }
+            catch (Exception ex)
+            {
+
+                ModelState.AddModelError(string.Empty, $"An error occured: {ex.Message}");
+            }
+            return RedirectToAction("RequestOBForm");
         }
     }
 }

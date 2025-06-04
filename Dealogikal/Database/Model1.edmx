@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="DealogikalDTRModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="DealogikalDTRModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="accLogs">
           <Key>
             <PropertyRef Name="logId" />
@@ -118,6 +118,7 @@
           <Property Name="startTime" Type="datetime" Nullable="false" />
           <Property Name="endTime" Type="datetime" Nullable="false" />
           <Property Name="status" Type="int" Nullable="false" />
+          <Property Name="obReason" Type="nvarchar(max)" Nullable="false" />
         </EntityType>
         <EntityType Name="overtimeRequest">
           <Key>
@@ -368,7 +369,8 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
             <End Role="userAccount" EntitySet="userAccount" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DealogikalDTRModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -422,10 +424,10 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
           <NavigationProperty Name="leaveRequest" Relationship="Self.FK_leaveRequest_employeeInfo" FromRole="employeeInfo" ToRole="leaveRequest" />
           <NavigationProperty Name="loginLogs" Relationship="Self.FK_loginLogs_employeeInfo" FromRole="employeeInfo" ToRole="loginLogs" />
           <NavigationProperty Name="notification" Relationship="Self.FK_notification_employeeInfo" FromRole="employeeInfo" ToRole="notification" />
+          <NavigationProperty Name="obRequest" Relationship="Self.FK_obRequest_employeeInfo" FromRole="employeeInfo" ToRole="obRequest" />
           <NavigationProperty Name="overtimeRequest" Relationship="Self.FK_overtimeRequest_employeeInfo" FromRole="employeeInfo" ToRole="overtimeRequest" />
           <NavigationProperty Name="todoLists" Relationship="Self.FK_todoLists_employeeInfo" FromRole="employeeInfo" ToRole="todoLists" />
           <NavigationProperty Name="userAccount" Relationship="Self.FK_userAccount_employeeInfo" FromRole="employeeInfo" ToRole="userAccount" />
-          <NavigationProperty Name="obRequest" Relationship="DealogikalDTRModel.FK_obRequest_employeeInfo" FromRole="employeeInfo" ToRole="obRequest" />
         </EntityType>
         <EntityType Name="feedback">
           <Key>
@@ -487,6 +489,20 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
           <Property Name="createdAt" Type="DateTime" Precision="3" />
           <Property Name="senderId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="employeeInfo" Relationship="Self.FK_notification_employeeInfo" FromRole="notification" ToRole="employeeInfo" />
+        </EntityType>
+        <EntityType Name="obRequest">
+          <Key>
+            <PropertyRef Name="obId" />
+          </Key>
+          <Property Name="obId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="employeeId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="dateFiled" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="obDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="startTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="endTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="status" Type="Int32" Nullable="false" />
+          <Property Name="obReason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="employeeInfo" Relationship="Self.FK_obRequest_employeeInfo" FromRole="obRequest" ToRole="employeeInfo" />
         </EntityType>
         <EntityType Name="overtimeRequest">
           <Key>
@@ -610,6 +626,20 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_obRequest_employeeInfo">
+          <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="obRequest" Type="Self.obRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="employeeInfo">
+              <PropertyRef Name="employeeId" />
+            </Principal>
+            <Dependent Role="obRequest">
+              <PropertyRef Name="employeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_overtimeRequest_employeeInfo">
           <End Role="employeeInfo" Type="Self.employeeInfo" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
@@ -673,6 +703,7 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
           <EntitySet Name="leaveRequest" EntityType="Self.leaveRequest" />
           <EntitySet Name="loginLogs" EntityType="Self.loginLogs" />
           <EntitySet Name="notification" EntityType="Self.notification" />
+          <EntitySet Name="obRequest" EntityType="Self.obRequest" />
           <EntitySet Name="overtimeRequest" EntityType="Self.overtimeRequest" />
           <EntitySet Name="role" EntityType="Self.role" />
           <EntitySet Name="todoLists" EntityType="Self.todoLists" />
@@ -698,6 +729,10 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
             <End Role="employeeInfo" EntitySet="employeeInfo" />
             <End Role="notification" EntitySet="notification" />
           </AssociationSet>
+          <AssociationSet Name="FK_obRequest_employeeInfo" Association="Self.FK_obRequest_employeeInfo">
+            <End Role="employeeInfo" EntitySet="employeeInfo" />
+            <End Role="obRequest" EntitySet="obRequest" />
+          </AssociationSet>
           <AssociationSet Name="FK_overtimeRequest_employeeInfo" Association="Self.FK_overtimeRequest_employeeInfo">
             <End Role="employeeInfo" EntitySet="employeeInfo" />
             <End Role="overtimeRequest" EntitySet="overtimeRequest" />
@@ -714,39 +749,7 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
             <End Role="role" EntitySet="role" />
             <End Role="userAccount" EntitySet="userAccount" />
           </AssociationSet>
-          <EntitySet Name="obRequest" EntityType="DealogikalDTRModel.obRequest" />
-          <AssociationSet Name="FK_obRequest_employeeInfo" Association="DealogikalDTRModel.FK_obRequest_employeeInfo">
-            <End Role="employeeInfo" EntitySet="employeeInfo" />
-            <End Role="obRequest" EntitySet="obRequest" />
-          </AssociationSet>
         </EntityContainer>
-        <EntityType Name="obRequest">
-          <Key>
-            <PropertyRef Name="obId" />
-          </Key>
-          <Property Name="obId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="employeeId" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="dateFiled" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="obDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="startTime" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="endTime" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="employeeInfo" Relationship="DealogikalDTRModel.FK_obRequest_employeeInfo" FromRole="obRequest" ToRole="employeeInfo" />
-        </EntityType>
-        <Association Name="FK_obRequest_employeeInfo">
-          <End Type="DealogikalDTRModel.employeeInfo" Role="employeeInfo" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="DealogikalDTRModel.obRequest" Role="obRequest" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="employeeInfo">
-              <PropertyRef Name="employeeId" />
-            </Principal>
-            <Dependent Role="obRequest">
-              <PropertyRef Name="employeeId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -863,6 +866,20 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="obRequest">
+            <EntityTypeMapping TypeName="DealogikalDTRModel.obRequest">
+              <MappingFragment StoreEntitySet="obRequest">
+                <ScalarProperty Name="obId" ColumnName="obId" />
+                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
+                <ScalarProperty Name="dateFiled" ColumnName="dateFiled" />
+                <ScalarProperty Name="obDate" ColumnName="obDate" />
+                <ScalarProperty Name="startTime" ColumnName="startTime" />
+                <ScalarProperty Name="endTime" ColumnName="endTime" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="obReason" ColumnName="obReason" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="overtimeRequest">
             <EntityTypeMapping TypeName="DealogikalDTRModel.overtimeRequest">
               <MappingFragment StoreEntitySet="overtimeRequest">
@@ -913,19 +930,6 @@ warning 6002: The table/view 'DealogikalDTR.dbo.vw_Role' does not have a primary
                 <ScalarProperty Name="userId" ColumnName="userId" />
                 <ScalarProperty Name="employeeId" ColumnName="employeeId" />
                 <ScalarProperty Name="roleName" ColumnName="roleName" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="obRequest">
-            <EntityTypeMapping TypeName="DealogikalDTRModel.obRequest">
-              <MappingFragment StoreEntitySet="obRequest">
-                <ScalarProperty Name="status" ColumnName="status" />
-                <ScalarProperty Name="endTime" ColumnName="endTime" />
-                <ScalarProperty Name="startTime" ColumnName="startTime" />
-                <ScalarProperty Name="obDate" ColumnName="obDate" />
-                <ScalarProperty Name="dateFiled" ColumnName="dateFiled" />
-                <ScalarProperty Name="employeeId" ColumnName="employeeId" />
-                <ScalarProperty Name="obId" ColumnName="obId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

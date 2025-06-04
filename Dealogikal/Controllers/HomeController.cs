@@ -1445,7 +1445,20 @@ namespace Dealogikal.Controllers
                 var notifManager = new NotificationManager();
                 var deptHead = _AccManager.GetDepartmentHeadByDepartment(userInfo.department);
 
-                if (deptHead != null)
+                if (userInfo.position == "Department Head")
+                {
+                    _MailManager.DHObEmail(
+                        userInfo.firstName,
+                        userInfo.lastName,
+                        ob.obReason,
+                        ob.obDate,
+                        ob.startTime,
+                        ob.endTime,
+                        ob.status,
+                        ref errMsg,
+                        userInfo.corporation
+                    );
+                } else if (deptHead != null)
                 {
                     notifManager.CreateNotification(
                     deptHead.employeeId,

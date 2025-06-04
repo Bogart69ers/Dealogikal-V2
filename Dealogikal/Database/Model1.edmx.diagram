@@ -4,31 +4,31 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="5ccc9c8e1fac46b1b2eddac23b32caa5" Name="Diagram1">
+      <Diagram DiagramId="3afbd885986647e586063046c75305be" Name="Diagram1">
         <EntityTypeShape EntityType="DealogikalDTRModel.accLogs" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DealogikalDTRModel.dtrRecords" Width="1.5" PointX="3" PointY="3.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="DealogikalDTRModel.employeeInfo" Width="1.5" PointX="0.75" PointY="13.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DealogikalDTRModel.employeeInfo" Width="1.5" PointX="0.75" PointY="13.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DealogikalDTRModel.feedback" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DealogikalDTRModel.images" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DealogikalDTRModel.leaveRequest" Width="1.5" PointX="3" PointY="10" IsExpanded="true" />
         <EntityTypeShape EntityType="DealogikalDTRModel.loginLogs" Width="1.5" PointX="3" PointY="13.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DealogikalDTRModel.notification" Width="1.5" PointX="3" PointY="17" IsExpanded="true" />
-        <EntityTypeShape EntityType="DealogikalDTRModel.overtimeRequest" Width="1.5" PointX="3" PointY="23.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="DealogikalDTRModel.role" Width="1.5" PointX="3.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="DealogikalDTRModel.todoLists" Width="1.5" PointX="3" PointY="27.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DealogikalDTRModel.userAccount" Width="1.5" PointX="6" PointY="15.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DealogikalDTRModel.obRequest" Width="1.5" PointX="3" PointY="20.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DealogikalDTRModel.overtimeRequest" Width="1.5" PointX="3" PointY="23.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DealogikalDTRModel.role" Width="1.5" PointX="3.75" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DealogikalDTRModel.todoLists" Width="1.5" PointX="3" PointY="27.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DealogikalDTRModel.userAccount" Width="1.5" PointX="6" PointY="15.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DealogikalDTRModel.vw_Role" Width="1.5" PointX="5.75" PointY="3.75" IsExpanded="true" />
         <AssociationConnector Association="DealogikalDTRModel.FK_dtrRecords_employeeInfo" ManuallyRouted="false" />
         <AssociationConnector Association="DealogikalDTRModel.FK_images_employeeInfo" ManuallyRouted="false" />
         <AssociationConnector Association="DealogikalDTRModel.FK_leaveRequest_employeeInfo" ManuallyRouted="false" />
         <AssociationConnector Association="DealogikalDTRModel.FK_loginLogs_employeeInfo" ManuallyRouted="false" />
         <AssociationConnector Association="DealogikalDTRModel.FK_notification_employeeInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="DealogikalDTRModel.FK_obRequest_employeeInfo" ManuallyRouted="false" />
         <AssociationConnector Association="DealogikalDTRModel.FK_overtimeRequest_employeeInfo" ManuallyRouted="false" />
         <AssociationConnector Association="DealogikalDTRModel.FK_todoLists_employeeInfo" ManuallyRouted="false" />
         <AssociationConnector Association="DealogikalDTRModel.FK_userAccount_employeeInfo" ManuallyRouted="false" />
         <AssociationConnector Association="DealogikalDTRModel.FK_userAccount_role" ManuallyRouted="false" />
-        <EntityTypeShape EntityType="DealogikalDTRModel.obRequest" Width="1.5" PointX="3" PointY="30.25" />
-        <AssociationConnector Association="DealogikalDTRModel.FK_obRequest_employeeInfo" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
